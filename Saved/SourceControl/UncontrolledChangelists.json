@@ -1,0 +1,20 @@
+{
+	"version": 1,
+	"changelists": [
+		{
+			"guid": "00000000000000000000000000000000",
+			"description": "Default Uncontrolled Changelist",
+			"files": [
+				"C:/Users/STUDENT/Documents/Unreal Projects/ShootingRange/Content/__ExternalActors__/FirstPerson/Lvl_FirstPerson/6/I5/5U3R0J6P3EIOET939AGA6V.uasset",
+				"C:/Users/STUDENT/Documents/Unreal Projects/ShootingRange/Content/__ExternalActors__/FirstPerson/Lvl_FirstPerson/2/QA/68S6E3ZVH9RBL9LIMO4NEU.uasset",
+				"C:/Users/STUDENT/Documents/Unreal Projects/ShootingRange/Content/__ExternalActors__/FirstPerson/Lvl_FirstPerson/6/YC/YDZYGP15L73FERSNI5MTD6.uasset",
+				"C:/Users/STUDENT/Documents/Unreal Projects/ShootingRange/Content/FirstPerson/Lvl_FirstPerson.umap",
+				"C:/Users/STUDENT/Documents/Unreal Projects/ShootingRange/Content/FirstPerson/Blueprints/BP_FirstPersonCharacter.uasset",
+				"C:/Users/STUDENT/Documents/Unreal Projects/ShootingRange/Content/FirstPerson/Blueprints/BP_BARUI.uasset",
+				"C:/Users/STUDENT/Documents/Unreal Projects/ShootingRange/Content/FirstPerson/Blueprints/NewFolder/BP_Health.uasset",
+				"C:/Users/STUDENT/Documents/Unreal Projects/ShootingRange/Content/FirstPerson/Blueprints/BP+Target.uasset",
+				"C:/Users/STUDENT/Documents/Unreal Projects/ShootingRange/Content/FirstPerson/Blueprints/Weapons/BP_Rifle.uasset"
+			]
+		}
+	]
+}

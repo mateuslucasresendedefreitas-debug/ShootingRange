@@ -2974,3 +2974,87 @@ Please see Output Log for details.
 [2025.11.12-14.32.42:225][ 32]LogEOSSDK: LogEOS: Updating Product SDK Config, Time: 18355.222656
 [2025.11.12-14.32.43:225][ 35]LogEOSSDK: LogEOS: SDK Config Product Update Request Completed - No Change
 [2025.11.12-14.32.43:226][ 35]LogEOSSDK: LogEOS: ScheduleNextSDKConfigDataUpdate - Time: 18355.890625, Update Interval: 302.129578
+[2025.11.12-14.38.23:606][208]LogEOSSDK: LogEOS: Updating Product SDK Config, Time: 18697.183594
+[2025.11.12-14.38.24:606][211]LogEOSSDK: LogEOS: SDK Config Product Update Request Completed - No Change
+[2025.11.12-14.38.24:606][211]LogEOSSDK: LogEOS: ScheduleNextSDKConfigDataUpdate - Time: 18697.851562, Update Interval: 353.016144
+[2025.11.12-14.44.49:324][365]LogEOSSDK: LogEOS: Updating Product SDK Config, Time: 19083.400391
+[2025.11.12-14.44.50:325][368]LogEOSSDK: LogEOS: SDK Config Product Update Request Completed - No Change
+[2025.11.12-14.44.50:325][368]LogEOSSDK: LogEOS: ScheduleNextSDKConfigDataUpdate - Time: 19084.068359, Update Interval: 331.002533
+[2025.11.12-14.51.13:710][518]LogEOSSDK: LogEOS: Updating Product SDK Config, Time: 19468.189453
+[2025.11.12-14.51.14:712][521]LogEOSSDK: LogEOS: SDK Config Product Update Request Completed - No Change
+[2025.11.12-14.51.14:712][521]LogEOSSDK: LogEOS: ScheduleNextSDKConfigDataUpdate - Time: 19468.855469, Update Interval: 343.324066
+[2025.11.12-14.53.19:398][767]LogUObjectHash: Compacting FUObjectHashTables data took   4.64ms
+[2025.11.12-14.53.19:419][767]LogFileHelpers: InternalPromptForCheckoutAndSave started...
+[2025.11.12-14.53.19:534][767]LogUObjectHash: Compacting FUObjectHashTables data took   0.63ms
+[2025.11.12-14.53.19:553][767]LogSavePackage: Moving output files for package: /Game/FirstPerson/Lvl_FirstPerson
+[2025.11.12-14.53.19:554][767]LogSavePackage: Moving '../../../../../../Users/STUDENT/Documents/Unreal Projects/ShootingRange/Saved/Lvl_FirstPerson61B90D09441D17DCCD016D850CD76490.tmp' to '../../../../../../Users/STUDENT/Documents/Unreal Projects/ShootingRange/Content/FirstPerson/Lvl_FirstPerson.umap'
+[2025.11.12-14.53.19:562][767]LogFileHelpers: InternalPromptForCheckoutAndSave started...
+[2025.11.12-14.53.19:570][767]LogSavePackage: Moving output files for package: /Game/__ExternalActors__/FirstPerson/Lvl_FirstPerson/6/I5/5U3R0J6P3EIOET939AGA6V
+[2025.11.12-14.53.19:571][767]LogSavePackage: Moving '../../../../../../Users/STUDENT/Documents/Unreal Projects/ShootingRange/Saved/5U3R0J6P3EIOET939AGA6VBBF0F59446A9501FF4E8879D7506B26F.tmp' to '../../../../../../Users/STUDENT/Documents/Unreal Projects/ShootingRange/Content/__ExternalActors__/FirstPerson/Lvl_FirstPerson/6/I5/5U3R0J6P3EIOET939AGA6V.uasset'
+[2025.11.12-14.53.19:582][767]LogSavePackage: Moving output files for package: /Game/__ExternalActors__/FirstPerson/Lvl_FirstPerson/2/QA/68S6E3ZVH9RBL9LIMO4NEU
+[2025.11.12-14.53.19:582][767]LogSavePackage: Moving '../../../../../../Users/STUDENT/Documents/Unreal Projects/ShootingRange/Saved/68S6E3ZVH9RBL9LIMO4NEUF6F29D414F0E157B5975EDAA1B767CB5.tmp' to '../../../../../../Users/STUDENT/Documents/Unreal Projects/ShootingRange/Content/__ExternalActors__/FirstPerson/Lvl_FirstPerson/2/QA/68S6E3ZVH9RBL9LIMO4NEU.uasset'
+[2025.11.12-14.53.19:593][767]LogSavePackage: Moving output files for package: /Game/__ExternalActors__/FirstPerson/Lvl_FirstPerson/6/YC/YDZYGP15L73FERSNI5MTD6
+[2025.11.12-14.53.19:593][767]LogSavePackage: Moving '../../../../../../Users/STUDENT/Documents/Unreal Projects/ShootingRange/Saved/YDZYGP15L73FERSNI5MTD6BAD0A53648D06FA2CD8E37912C219E30.tmp' to '../../../../../../Users/STUDENT/Documents/Unreal Projects/ShootingRange/Content/__ExternalActors__/FirstPerson/Lvl_FirstPerson/6/YC/YDZYGP15L73FERSNI5MTD6.uasset'
+[2025.11.12-14.53.19:595][767]LogFileHelpers: InternalPromptForCheckoutAndSave took 33.508 ms
+[2025.11.12-14.53.19:598][767]LogFileHelpers: Saving map 'Lvl_FirstPerson' took 0.113
+[2025.11.12-14.53.19:600][767]LogSavePackage: Moving output files for package: /Game/__ExternalActors__/FirstPerson/Lvl_FirstPerson/6/I5/5U3R0J6P3EIOET939AGA6V
+[2025.11.12-14.53.19:600][767]LogSavePackage: Moving '../../../../../../Users/STUDENT/Documents/Unreal Projects/ShootingRange/Saved/5U3R0J6P3EIOET939AGA6V33D9D2444F3E856952396FA0597DDED0.tmp' to '../../../../../../Users/STUDENT/Documents/Unreal Projects/ShootingRange/Content/__ExternalActors__/FirstPerson/Lvl_FirstPerson/6/I5/5U3R0J6P3EIOET939AGA6V.uasset'
+[2025.11.12-14.53.19:604][767]LogSavePackage: Moving output files for package: /Game/__ExternalActors__/FirstPerson/Lvl_FirstPerson/2/QA/68S6E3ZVH9RBL9LIMO4NEU
+[2025.11.12-14.53.19:605][767]LogSavePackage: Moving '../../../../../../Users/STUDENT/Documents/Unreal Projects/ShootingRange/Saved/68S6E3ZVH9RBL9LIMO4NEU4AB711154E68EA11E2329680A0BFE35C.tmp' to '../../../../../../Users/STUDENT/Documents/Unreal Projects/ShootingRange/Content/__ExternalActors__/FirstPerson/Lvl_FirstPerson/2/QA/68S6E3ZVH9RBL9LIMO4NEU.uasset'
+[2025.11.12-14.53.19:608][767]LogSavePackage: Moving output files for package: /Game/__ExternalActors__/FirstPerson/Lvl_FirstPerson/6/YC/YDZYGP15L73FERSNI5MTD6
+[2025.11.12-14.53.19:610][767]LogSavePackage: Moving '../../../../../../Users/STUDENT/Documents/Unreal Projects/ShootingRange/Saved/YDZYGP15L73FERSNI5MTD6E3EC2A904398A70DED5911A84F35AAF1.tmp' to '../../../../../../Users/STUDENT/Documents/Unreal Projects/ShootingRange/Content/__ExternalActors__/FirstPerson/Lvl_FirstPerson/6/YC/YDZYGP15L73FERSNI5MTD6.uasset'
+[2025.11.12-14.53.19:611][767]OBJ SavePackage: Generating thumbnails for [0] asset(s) in package [/Game/FirstPerson/Blueprints/BP_FirstPersonCharacter] ([2] browsable assets)...
+[2025.11.12-14.53.19:611][767]OBJ SavePackage: Finished generating thumbnails for package [/Game/FirstPerson/Blueprints/BP_FirstPersonCharacter]
+[2025.11.12-14.53.19:643][767]LogSavePackage: Moving output files for package: /Game/FirstPerson/Blueprints/BP_FirstPersonCharacter
+[2025.11.12-14.53.19:643][767]LogSavePackage: Moving '../../../../../../Users/STUDENT/Documents/Unreal Projects/ShootingRange/Saved/BP_FirstPersonCharacter583F13084125928083506C84F7AAFC3C.tmp' to '../../../../../../Users/STUDENT/Documents/Unreal Projects/ShootingRange/Content/FirstPerson/Blueprints/BP_FirstPersonCharacter.uasset'
+[2025.11.12-14.53.19:646][767]OBJ SavePackage: Generating thumbnails for [1] asset(s) in package [/Game/FirstPerson/Blueprints/BP_BARUI] ([2] browsable assets)...
+[2025.11.12-14.53.19:646][767]OBJ SavePackage: Finished generating thumbnails for package [/Game/FirstPerson/Blueprints/BP_BARUI]
+[2025.11.12-14.53.19:662][767]LogSavePackage: Moving output files for package: /Game/FirstPerson/Blueprints/BP_BARUI
+[2025.11.12-14.53.19:662][767]LogSavePackage: Moving '../../../../../../Users/STUDENT/Documents/Unreal Projects/ShootingRange/Saved/BP_BARUI2D08CE844461899F15877486841A3A3C.tmp' to '../../../../../../Users/STUDENT/Documents/Unreal Projects/ShootingRange/Content/FirstPerson/Blueprints/BP_BARUI.uasset'
+[2025.11.12-14.53.19:673][767]OBJ SavePackage: Generating thumbnails for [0] asset(s) in package [/Game/FirstPerson/Blueprints/NewFolder/BP_Health] ([2] browsable assets)...
+[2025.11.12-14.53.19:673][767]OBJ SavePackage: Finished generating thumbnails for package [/Game/FirstPerson/Blueprints/NewFolder/BP_Health]
+[2025.11.12-14.53.19:692][767]LogSavePackage: Moving output files for package: /Game/FirstPerson/Blueprints/NewFolder/BP_Health
+[2025.11.12-14.53.19:692][767]LogSavePackage: Moving '../../../../../../Users/STUDENT/Documents/Unreal Projects/ShootingRange/Saved/BP_Health3EBC2FF540904A25A41720B02B231264.tmp' to '../../../../../../Users/STUDENT/Documents/Unreal Projects/ShootingRange/Content/FirstPerson/Blueprints/NewFolder/BP_Health.uasset'
+[2025.11.12-14.53.19:699][767]OBJ SavePackage: Generating thumbnails for [1] asset(s) in package [/Game/FirstPerson/Blueprints/BP+Target] ([2] browsable assets)...
+[2025.11.12-14.53.19:699][767]OBJ SavePackage: Finished generating thumbnails for package [/Game/FirstPerson/Blueprints/BP+Target]
+[2025.11.12-14.53.19:710][767]LogSavePackage: Moving output files for package: /Game/FirstPerson/Blueprints/BP+Target
+[2025.11.12-14.53.19:710][767]LogSavePackage: Moving '../../../../../../Users/STUDENT/Documents/Unreal Projects/ShootingRange/Saved/BP+Target1D5427B143D11678707294AED023BA60.tmp' to '../../../../../../Users/STUDENT/Documents/Unreal Projects/ShootingRange/Content/FirstPerson/Blueprints/BP+Target.uasset'
+[2025.11.12-14.53.19:717][767]OBJ SavePackage: Generating thumbnails for [1] asset(s) in package [/Game/FirstPerson/Blueprints/Weapons/BP_Rifle] ([2] browsable assets)...
+[2025.11.12-14.53.19:717][767]OBJ SavePackage: Finished generating thumbnails for package [/Game/FirstPerson/Blueprints/Weapons/BP_Rifle]
+[2025.11.12-14.53.19:730][767]LogSavePackage: Moving output files for package: /Game/FirstPerson/Blueprints/Weapons/BP_Rifle
+[2025.11.12-14.53.19:730][767]LogSavePackage: Moving '../../../../../../Users/STUDENT/Documents/Unreal Projects/ShootingRange/Saved/BP_RifleFB6686A548F77E52F4BDA19A192F9190.tmp' to '../../../../../../Users/STUDENT/Documents/Unreal Projects/ShootingRange/Content/FirstPerson/Blueprints/Weapons/BP_Rifle.uasset'
+[2025.11.12-14.53.19:746][767]LogFileHelpers: InternalPromptForCheckoutAndSave took 327.842 ms (total: 361.351 ms)
+[2025.11.12-14.53.19:805][767]LogContentValidation: Display: Starting to validate 9 assets
+[2025.11.12-14.53.19:805][767]LogContentValidation: Enabled validators:
+[2025.11.12-14.53.19:806][767]LogContentValidation: 	/Script/DataValidation.EditorValidator_Material
+[2025.11.12-14.53.19:806][767]LogContentValidation: 	/Script/DataValidation.DirtyFilesChangelistValidator
+[2025.11.12-14.53.19:806][767]LogContentValidation: 	/Script/DataValidation.EditorValidator_Localization
+[2025.11.12-14.53.19:806][767]LogContentValidation: 	/Script/DataValidation.PackageFileValidator
+[2025.11.12-14.53.19:806][767]LogContentValidation: 	/Script/DataValidation.WorldPartitionChangelistValidator
+[2025.11.12-14.53.19:806][767]LogContentValidation: 	/Script/InputBlueprintNodes.EnhancedInputUserWidgetValidator
+[2025.11.12-14.53.19:807][767]AssetCheck: /Game/FirstPerson/Lvl_FirstPerson Validating asset
+[2025.11.12-14.53.19:807][767]AssetCheck: /Game/FirstPerson/Blueprints/BP_FirstPersonCharacter Validating asset
+[2025.11.12-14.53.19:807][767]AssetCheck: /Game/FirstPerson/Blueprints/BP_BARUI Validating asset
+[2025.11.12-14.53.19:807][767]AssetCheck: /Game/FirstPerson/Blueprints/NewFolder/BP_Health Validating asset
+[2025.11.12-14.53.19:807][767]AssetCheck: /Game/FirstPerson/Blueprints/BP+Target Validating asset
+[2025.11.12-14.53.19:807][767]AssetCheck: /Game/FirstPerson/Blueprints/Weapons/BP_Rifle Validating asset
+[2025.11.12-14.53.19:900][767]LogSourceControl: Display: Uncontrolled Changelist persistency file saved ../../../../../../Users/STUDENT/Documents/Unreal Projects/ShootingRange/Saved/SourceControl/UncontrolledChangelists.json
+[2025.11.12-14.53.31:769][228]LogMonitoredProcess: Running Serialized UAT: [ cmd.exe /c ""C:/Program Files/Epic Games/UE_5.6/Engine/Build/BatchFiles/RunUAT.bat" ZipProjectUp -nocompileeditor -project="C:/Users/STUDENT/Documents/Unreal Projects/ShootingRange/" -install="C:/Users/STUDENT/Documents/Unreal Projects/ShootingRange/ShootingRange1.zip"" -nocompile -nocompileuat ]
+[2025.11.12-14.53.31:780][228]LogStreaming: Display: FlushAsyncLoading(624): 1 QueuedPackages, 0 AsyncPackages
+[2025.11.12-14.53.31:823][228]UATHelper: Zip Project Task (Windows (Editor)): Running AutomationTool...
+[2025.11.12-14.53.31:865][229]UATHelper: Zip Project Task (Windows (Editor)): Using bundled DotNet SDK version: 8.0.300 win-x64
+[2025.11.12-14.53.32:003][233]UATHelper: Zip Project Task (Windows (Editor)): Starting AutomationTool...
+[2025.11.12-14.53.32:014][233]UATHelper: Zip Project Task (Windows (Editor)): Parsing command line: ZipProjectUp -nocompileeditor -project="C:/Users/STUDENT/Documents/Unreal Projects/ShootingRange/" -install="C:/Users/STUDENT/Documents/Unreal Projects/ShootingRange/ShootingRange1.zip" -nocompile -nocompileuat
+[2025.11.12-14.53.32:162][242]UATHelper: Zip Project Task (Windows (Editor)): Initializing script modules...
+[2025.11.12-14.53.32:662][279]UATHelper: Zip Project Task (Windows (Editor)): Total script module initialization time: 0.49 s.
+[2025.11.12-14.53.32:735][284]UATHelper: Zip Project Task (Windows (Editor)): Using C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe
+[2025.11.12-14.53.33:095][314]UATHelper: Zip Project Task (Windows (Editor)): Executing commands...
+[2025.11.12-14.53.33:095][314]UATHelper: Zip Project Task (Windows (Editor)): Started zipping project up
+[2025.11.12-14.53.33:095][314]UATHelper: Zip Project Task (Windows (Editor)): Project directory: C:\Users\STUDENT\Documents\Unreal Projects\ShootingRange
+[2025.11.12-14.53.33:095][314]UATHelper: Zip Project Task (Windows (Editor)): Install directory: C:/Users/STUDENT/Documents/Unreal Projects/ShootingRange/ShootingRange1.zip
+[2025.11.12-14.53.33:095][314]UATHelper: Zip Project Task (Windows (Editor)): Packaging up the project...
+[2025.11.12-14.53.35:327][530]UATHelper: Zip Project Task (Windows (Editor)): Completed zipping project up
+[2025.11.12-14.53.35:327][530]UATHelper: Zip Project Task (Windows (Editor)): BUILD SUCCESSFUL
+[2025.11.12-14.53.35:327][530]UATHelper: Zip Project Task (Windows (Editor)): AutomationTool executed for 0h 0m 3s
+[2025.11.12-14.53.35:327][530]UATHelper: Zip Project Task (Windows (Editor)): AutomationTool exiting with ExitCode=0 (Success)
+[2025.11.12-14.53.35:377][534]LogStreaming: Display: FlushAsyncLoading(625): 1 QueuedPackages, 0 AsyncPackages
