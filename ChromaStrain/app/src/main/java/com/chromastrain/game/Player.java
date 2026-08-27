@@ -28,11 +28,19 @@ public class Player {
     private float burstT;
     private int burstNumber;        // Needlewraith neurofracture cycle
 
-    // melee
+    // melee — secondary attack, one distinct mechanic per strain
     public float meleeCd;
-    private int comboIdx;
+    public int comboIdx;             // exposed for HUD combo pips
     public float swingAnim;
     private float swingAngle;
+    private boolean meleeBuffered;   // a tap during cooldown queues; fires the instant it clears
+    private float comboIdleT;        // resets the green/blue combo chain if you wait too long
+    public float meleeHoldT;         // red: how long the attack button has been held
+    public boolean meleeCharging;    // red: past the charge threshold, ready to release
+    public float chargeCd;           // red: cooldown for the charged smash (separate from meleeCd)
+
+    // usage counters (tutorial step detection; harmless elsewhere)
+    public int shotsFired, meleeUses, chargeUses, comboUses, skillUses, gadgetUses, doseUses;
 
     // skill / gadget
     public float skillCd;
@@ -98,7 +106,18 @@ public class Player {
 
     public void update(float dt, float mvx, float mvy, float aimX, float aimY, boolean wantFire) {
         // timers
-        if (meleeCd > 0) meleeCd -= dt;
+        if (meleeCd > 0) {
+            meleeCd -= dt;
+            if (meleeCd <= 0 && meleeBuffered) {
+                meleeBuffered = false;
+                fireMeleeNow();
+            }
+        }
+        if (chargeCd > 0) chargeCd -= dt;
+        if (comboIdx > 0) {
+            comboIdleT += dt;
+            if (comboIdleT > comboWindow()) comboIdx = 0;
+        }
         float cdTick = dt * ((doseT > 0 && faction == Strain.BLUE) ? 2f : 1f);
         if (skillCd > 0) skillCd -= cdTick;
         if (gadgetCd > 0) gadgetCd -= cdTick;
@@ -180,6 +199,7 @@ public class Player {
     }
 
     private void fireOne(boolean neuroBurst) {
+        shotsFired++;
         float[] gun = Strain.GUN[faction];
         float dmg = G.rnd(gun[0], gun[1]) * totalDmgMul();
         boolean crit = G.rnd() < critChance() || (doseT > 0 && faction == Strain.GREEN);
@@ -234,27 +254,81 @@ public class Player {
 
     // ------------------------------------------------------------- actions
 
+    /** Attack button pressed. Always gives immediate feedback: fires now if
+     *  ready, or buffers a single queued swing that fires the instant the
+     *  cooldown clears — a tap is never silently dropped. */
+    public void meleeDown() {
+        if (faction == Strain.RED) {
+            meleeHoldT = 0.0001f;
+            meleeCharging = false;
+        }
+        if (meleeCd > 0) {
+            if (!meleeBuffered) {
+                meleeBuffered = true;
+                w.game.sfx.play("ui_tap", 0.35f, 1.4f);
+            }
+            return;
+        }
+        fireMeleeNow();
+    }
+
+    /** Legacy/bot entry point — equivalent to a single tap-and-release. */
     public void tryMelee() {
-        if (meleeCd > 0) return;
+        meleeDown();
+    }
+
+    /** Red only: called every frame the attack button stays held. */
+    public void meleeHeld(float dt) {
+        if (faction != Strain.RED || meleeHoldT <= 0) return;
+        meleeHoldT += dt;
+        if (meleeHoldT > 0.40f) meleeCharging = true;
+    }
+
+    /** Red only: attack button released — unleashes the charged smash if held long enough. */
+    public void meleeRelease() {
+        if (faction == Strain.RED && meleeCharging && chargeCd <= 0) {
+            fireChargedSmash();
+            chargeCd = 3.0f;
+        }
+        meleeHoldT = 0;
+        meleeCharging = false;
+    }
+
+    private float comboWindow() {
+        if (faction == Strain.GREEN) return 0.65f;
+        if (faction == Strain.BLUE) return 0.85f;
+        return 0.5f;
+    }
+
+    private void fireMeleeNow() {
         float[] m = Strain.MELEE[faction];
         meleeCd = 1f / m[2];
         swingAnim = 1f;
         swingAngle = aim;
+        comboIdleT = 0;
         comboIdx++;
-        float dmg = G.rnd(m[0], m[1]) * totalDmgMul();
+        meleeUses++;
 
-        // Bloodfire Memory: red melee scales with missing HP
+        // Green (Ghost Cut) and Blue (Combo Surge) pay off on the 3rd chained
+        // hit; Red never chains — its identity is the hold-release charge.
+        boolean finisher = faction != Strain.RED && comboIdx % 3 == 0;
+
+        float dmg = G.rnd(m[0], m[1]) * totalDmgMul();
         if (faction == Strain.RED) {
+            // Bloodfire Memory: red melee scales with missing HP
             float missing = 1f - hp / maxHp;
             dmg *= 1f + missing * 0.5f;
         }
-        // System Overclock: +3% per active buff
         if (faction == Strain.BLUE) {
+            // System Overclock: +3% per active buff
             int buffs = (doseT > 0 ? 1 : 0) + (bloomShield ? 1 : 0) + dataCharges;
             dmg *= 1f + 0.03f * buffs;
+            if (finisher) dmg *= 1.35f; // Combo Surge payoff
         }
+        if (faction == Strain.GREEN && finisher) dmg *= 1.4f; // Ghost Cut payoff
 
         boolean crit = G.rnd() < critChance() + 0.08f || (doseT > 0 && faction == Strain.GREEN);
+        if (faction == Strain.GREEN && finisher) crit = true; // Ghost Cut always crits
         if (stealthStrike) {
             crit = true;
             stealthStrike = false;
@@ -262,21 +336,52 @@ public class Player {
         }
         if (crit) dmg *= 1.8f;
 
-        boolean evoFinisher = faction == Strain.BLUE && comboIdx % 3 == 0;
-        boolean lunge = faction == Strain.GREEN;
-        if (lunge) {
-            // Whisperfangs: short dash toward aim
-            x += (float) Math.cos(aim) * 90;
-            y += (float) Math.sin(aim) * 90;
+        if (faction == Strain.GREEN) {
+            // Whisperfangs: short dash toward aim; Ghost Cut dashes further, behind the target
+            float dashDist = finisher ? 150 : 90;
+            x += (float) Math.cos(aim) * dashDist;
+            y += (float) Math.sin(aim) * dashDist;
             dashT = 0.15f;
             w.clampToArenaPlayer(this);
         }
 
-        w.meleeSweep(this, aim, m[3] * (evoFinisher ? 1.25f : 1f), m[4], dmg, crit, evoFinisher);
+        float range = m[3] * (finisher ? 1.3f : 1f);
+        float arc = m[4] * (finisher ? 1.3f : 1f);
+        boolean killedAny = w.meleeSweep(this, aim, range, arc, dmg, crit, finisher);
+
+        if (finisher && faction == Strain.GREEN) {
+            comboUses++;
+            if (killedAny) stealthT = Math.max(stealthT, 2f); // Ghost Cut: stealth on a kill
+            w.game.sfx.play("skill_green", 0.6f, 1.3f);
+            w.fx.burst(x, y, 14, 260, 0.4f, 7, Palette.GREEN, 3);
+        }
+        if (finisher && faction == Strain.BLUE) {
+            comboUses++;
+            w.comboStunPulse(this, 145, dmg * 0.4f); // Combo Surge: kinetic stun pulse
+            w.game.sfx.play("skill_blue", 0.6f, 1.2f);
+        }
+
         w.game.sfx.playVar(faction == Strain.RED ? "melee_red"
                 : (faction == Strain.GREEN ? "melee_green" : "melee_blue"), 0.7f);
-        w.cam.shake(faction == Strain.RED ? 7f : 4f);
+        w.cam.shake(faction == Strain.RED ? 7f : (finisher ? 9f : 4f));
+        w.game.haptic(finisher ? 30 : 16, finisher ? 150 : 90);
         if (stealthT > 0) exitStealth();
+    }
+
+    private void fireChargedSmash() {
+        float[] m = Strain.MELEE[faction];
+        float missing = 1f - hp / maxHp;
+        float dmg = G.rnd(m[0], m[1]) * totalDmgMul() * (1f + missing * 0.5f) * 2.0f;
+        boolean crit = G.rnd() < critChance() + 0.15f;
+        if (crit) dmg *= 1.8f;
+        swingAnim = 1f;
+        swingAngle = aim;
+        w.meleeSweep(this, aim, m[3] * 1.5f, m[4] * 1.35f, dmg, crit, true);
+        w.cam.shake(17f);
+        w.game.haptic(55, 230);
+        w.game.sfx.play("melee_red", 1f, 0.7f);
+        w.fx.burst(x, y, 22, 320, 0.6f, 10, Palette.RED, 2);
+        chargeUses++;
     }
 
     public void trySkill() {
@@ -286,6 +391,7 @@ public class Player {
             return;
         }
         skillCd = Strain.SKILL_CD[faction] * cdMul;
+        skillUses++;
         if (faction == Strain.RED) {
             // Seismic Fist
             float radius = 260;
@@ -310,6 +416,7 @@ public class Player {
     public void tryGadget() {
         if (gadgetCd > 0) return;
         gadgetCd = Strain.GADGET_CD[faction] * cdMul;
+        gadgetUses++;
         float tx = x + (float) Math.cos(aim) * 300;
         float ty = y + (float) Math.sin(aim) * 300;
         if (faction == Strain.RED) {
@@ -329,6 +436,7 @@ public class Player {
         }
         doseMeter = 0;
         doseT = faction == Strain.BLUE ? 6f : 8f;
+        doseUses++;
         w.game.sfx.play("dose", 1f, 1f);
         w.game.haptic(60, 200);
         w.fx.burst(x, y, 26, 320, 0.8f, 9, Palette.DOSE, 2);
@@ -429,6 +537,11 @@ public class Player {
 
         if (hurtFlash > 0) {
             G.ring(c, x, y, r + 4, 3f, Palette.withAlpha(Palette.DANGER, (int) (255 * hurtFlash / 0.3f)));
+        }
+
+        if (meleeCharging) {
+            float cg = G.clamp((meleeHoldT - 0.40f) / 0.6f, 0, 1);
+            G.glow(c, x, y, r * (2.0f + cg * 1.8f), Palette.withAlpha(Palette.GOLD, (int) (90 + 130 * cg)));
         }
     }
 }

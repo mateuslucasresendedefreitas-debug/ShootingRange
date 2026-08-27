@@ -339,7 +339,7 @@ public class Enemy {
         if (distPlayer < r + p.r && frozenT <= 0) {
             float dd = contactDmg * w.enemyDmgMul * damageDealtMul();
             if (type == BRUTE && chargeT > 0) dd *= 1.6f;
-            if (w.hurtPlayer(dd, x, y) && type == BRUTE) {
+            if (dd > 0 && w.hurtPlayer(dd, x, y) && type == BRUTE) {
                 chargeT = 0;
                 atkCd = Math.max(atkCd, 1.2f);
             }

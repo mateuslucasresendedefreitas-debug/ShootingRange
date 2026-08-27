@@ -17,9 +17,10 @@ public class RunScreen extends Screen {
     private final float[] tX = new float[Input.MAX];
     private final float[] tY = new float[Input.MAX];
 
-    // ability buttons (world-independent UI)
-    private float btnR = 46;
+    // ability buttons (world-independent UI) — +17% over the original 46 radius
+    private float btnR = 54;
     private float meleeX, meleeY, skillX, skillY, gadgetX, gadgetY, doseX, doseY;
+    private int meleeHoldPointer = -1;
     private boolean paused;
     private final Ui.Btn resumeBtn = new Ui.Btn();
     private final Ui.Btn retryBtn = new Ui.Btn();
@@ -60,10 +61,10 @@ public class RunScreen extends Screen {
     }
 
     private boolean overButton(float x, float y) {
-        return G.dist(x, y, meleeX, meleeY) < btnR + 14
-                || G.dist(x, y, skillX, skillY) < btnR + 14
-                || G.dist(x, y, gadgetX, gadgetY) < btnR + 14
-                || G.dist(x, y, doseX, doseY) < btnR + 14
+        return G.dist(x, y, meleeX, meleeY) < btnR + 16
+                || G.dist(x, y, skillX, skillY) < btnR + 16
+                || G.dist(x, y, gadgetX, gadgetY) < btnR + 16
+                || G.dist(x, y, doseX, doseY) < btnR + 16
                 || (x > game.w - 90 && y < 90);
     }
 
@@ -120,19 +121,20 @@ public class RunScreen extends Screen {
                 continue;
             }
             if (world.player.hp > 0) {
-                if (G.dist(e.x, e.y, meleeX, meleeY) < btnR + 14) {
-                    world.player.tryMelee();
+                if (G.dist(e.x, e.y, meleeX, meleeY) < btnR + 16) {
+                    world.player.meleeDown();
+                    meleeHoldPointer = e.id;
                     continue;
                 }
-                if (G.dist(e.x, e.y, skillX, skillY) < btnR + 14) {
+                if (G.dist(e.x, e.y, skillX, skillY) < btnR + 16) {
                     world.player.trySkill();
                     continue;
                 }
-                if (G.dist(e.x, e.y, gadgetX, gadgetY) < btnR + 14) {
+                if (G.dist(e.x, e.y, gadgetX, gadgetY) < btnR + 16) {
                     world.player.tryGadget();
                     continue;
                 }
-                if (G.dist(e.x, e.y, doseX, doseY) < btnR + 14) {
+                if (G.dist(e.x, e.y, doseX, doseY) < btnR + 16) {
                     world.player.tryDose();
                     continue;
                 }
@@ -147,6 +149,15 @@ public class RunScreen extends Screen {
         game.input.snapshot(tDown, tX, tY);
         moveStick.track(tDown, tX, tY);
         aimStick.track(tDown, tX, tY);
+
+        if (meleeHoldPointer >= 0) {
+            if (world.player.hp > 0 && game.touchDown(meleeHoldPointer)) {
+                world.player.meleeHeld(dt);
+            } else {
+                world.player.meleeRelease();
+                meleeHoldPointer = -1;
+            }
+        }
 
         float mvx = moveStick.dx, mvy = moveStick.dy;
         float mlen = G.len(mvx, mvy);
@@ -317,6 +328,21 @@ public class RunScreen extends Screen {
         boolean doseUp = p.doseReady();
         drawAbility(c, doseX, doseY, 3, doseUp ? Palette.DOSE : Palette.INK_DIM,
                 0, 1, p.doseMeter / 100f, doseUp);
+
+        // secondary-attack identity cues: red charges, green/blue chain a combo
+        if (p.faction == Strain.RED && p.meleeCharging) {
+            float pulse = (float) Math.sin(game.time * 10f) * 0.5f + 0.5f;
+            G.ring(c, meleeX, meleeY, btnR + 8 + pulse * 4, 3f,
+                    Palette.withAlpha(Palette.GOLD, (int) (150 + 100 * pulse)));
+        } else if (p.faction != Strain.RED) {
+            int pip = p.comboIdx % 3;
+            float dotY = meleeY - btnR - 16;
+            for (int i = 0; i < 3; i++) {
+                float dxp = meleeX + (i - 1) * 15;
+                G.circle(c, dxp, dotY, 5, i < pip
+                        ? Strain.color(p.faction) : Palette.withAlpha(Palette.INK_DIM, 90));
+            }
+        }
 
         // tutorial hints
         if (tutorialT > 0 && world.state != World.STATE_VICTORY && world.state != World.STATE_DEFEAT) {

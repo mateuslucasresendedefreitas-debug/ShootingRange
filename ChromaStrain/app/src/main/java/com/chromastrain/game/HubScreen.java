@@ -29,6 +29,7 @@ public class HubScreen extends Screen {
 
     // ops
     private final Ui.Btn[] deployBtns = {new Ui.Btn(), new Ui.Btn(), new Ui.Btn()};
+    private final Ui.Btn trainingBtn = new Ui.Btn();
 
     // lab quiz
     private String[] chips = new String[6];
@@ -118,6 +119,12 @@ public class HubScreen extends Screen {
     }
 
     private void updateOps(float dt, ArrayList<Input.Ev> evs) {
+        trainingBtn.update(dt);
+        if (trainingBtn.tapped(evs)) {
+            game.tapFeedback();
+            game.switchTo(new TutorialScreen(game));
+            return;
+        }
         int f = game.save.faction;
         for (int s = 0; s < 3; s++) {
             int opId = f * 3 + s;
@@ -418,7 +425,7 @@ public class HubScreen extends Screen {
     private void drawOps(Canvas c) {
         int f = game.save.faction;
         float y0 = topH + 10;
-        float cardH = (game.h - topH - botH - 40) / 3f;
+        float cardH = (game.h - topH - botH - 76) / 3f;
         G.textB(c, Strain.FACTION[f] + " — " + Strain.CLASS_LINE[f], 24, y0 + 8, 16, Palette.INK_DIM);
         if (game.save.cleared[f * 3 + Ops.SLOT_HUNT]) {
             G.textR(c, "SET ACTIVE: " + Strain.SET_NAME[f] + " — " + Strain.SET_DESC[f],
@@ -432,9 +439,17 @@ public class HubScreen extends Screen {
             G.textB(c, "▲ TAP TO SWITCH STRAIN — EACH ONE PLAYS DIFFERENTLY", 470, y0 + 8, 15,
                     Palette.withAlpha(Strain.color(f), (int) (140 + 110 * pulse)));
         }
+
+        trainingBtn.set(game.w / 2f, y0 + 44, 360, 42);
+        trainingBtn.label = "◈ SALA DE TREINO";
+        trainingBtn.textSize = 18;
+        trainingBtn.color = Palette.withAlpha(Strain.color(f), 34);
+        trainingBtn.edge = Strain.color(f);
+        trainingBtn.draw(c);
+
         for (int s = 0; s < 3; s++) {
             int opId = f * 3 + s;
-            float cy = y0 + 18 + s * (cardH + 6);
+            float cy = y0 + 58 + s * (cardH + 6);
             boolean unlocked = game.save.opUnlocked(opId);
             int col = Strain.color(f);
 

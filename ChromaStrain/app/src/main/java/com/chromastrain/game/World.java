@@ -15,8 +15,10 @@ public class World {
     public static final int STATE_BOSS = 4;
     public static final int STATE_VICTORY = 5;
     public static final int STATE_DEFEAT = 6;
+    public static final int STATE_SANDBOX = 7;   // training room: no waves, no boss, no defeat
 
     public final Game game;
+    public final boolean tutorial;
     public final int opId;
     public final int factionOp;
     public final int slot;
@@ -79,6 +81,7 @@ public class World {
 
     public World(Game game, int opId) {
         this.game = game;
+        this.tutorial = false;
         this.opId = opId;
         factionOp = Ops.faction(opId);
         slot = Ops.slot(opId);
@@ -108,6 +111,55 @@ public class World {
         showBanner(Ops.NAME[opId], Strain.color(factionOp));
     }
 
+    /** Training room: a pressure-free arena with stationary, harmless dummies. */
+    public World(Game game, boolean tutorialMode) {
+        this.game = game;
+        this.tutorial = true;
+        this.opId = -1;
+        factionOp = game.save.faction;
+        slot = 0;
+        totalWaves = 0;
+        player = new Player(this, game.save.faction, game.save);
+        arenaW = 1400;
+        arenaH = 900;
+        player.x = arenaW / 2;
+        player.y = arenaH * 0.62f;
+        player.doseMeter = 100;
+        cam.x = player.x;
+        cam.y = player.y;
+        state = STATE_SANDBOX;
+        spawnDummies();
+    }
+
+    private void spawnDummies() {
+        addDummy(arenaW * 0.5f, arenaH * 0.28f);
+        addDummy(arenaW * 0.74f, arenaH * 0.42f);
+        addDummy(arenaW * 0.26f, arenaH * 0.42f);
+    }
+
+    private void addDummy(float x, float y) {
+        Enemy e = new Enemy();
+        e.init(Enemy.HUSK, x, y, 1f, 1f, factionOp, false);
+        e.speed = 0;
+        e.contactDmg = 0;
+        e.hp = e.maxHp = 5000;
+        enemies.add(e);
+    }
+
+    private float dummyRespawnT = 1.2f;
+
+    private void updateTutorial(float dt) {
+        // fast, unconditional dose refill so every ability can be tested freely
+        player.doseMeter = Math.min(100, player.doseMeter + dt * 22f);
+        if (enemies.isEmpty()) {
+            dummyRespawnT -= dt;
+            if (dummyRespawnT <= 0) {
+                spawnDummies();
+                dummyRespawnT = 1.0f;
+            }
+        }
+    }
+
     // ================================================================ update
 
     public void update(float dt) {
@@ -133,6 +185,7 @@ public class World {
 
         if (state == STATE_WAVE) waveT += wdt;
         if (beamHurtCd > 0) beamHurtCd -= wdt;
+        if (tutorial) updateTutorial(wdt);
         updateModifiers(wdt);
         updateStates(dt);
 
@@ -493,9 +546,11 @@ public class World {
         return landed;
     }
 
-    public void meleeSweep(Player p, float ang, float range, float arc, float dmg,
-                           boolean crit, boolean finisher) {
+    /** @return true if this sweep killed at least one enemy. */
+    public boolean meleeSweep(Player p, float ang, float range, float arc, float dmg,
+                              boolean crit, boolean finisher) {
         int hits = 0;
+        boolean killedAny = false;
         for (int i = -1; i < enemies.size(); i++) {
             Enemy e = i < 0 ? boss : enemies.get(i);
             if (e == null || !e.alive || e.spawnT > 0) continue;
@@ -510,6 +565,7 @@ public class World {
             lastHitWasMelee = true;
             float dealt = e.damage(this, dmg, crit);
             hits++;
+            if (!e.alive) killedAny = true;
             p.meleeLifesteal(dealt);
             addDmgText(e.x + G.rnd(-12, 12), e.y - e.r - 8, String.valueOf((int) dealt),
                     crit ? Palette.GOLD : 0xFFFFFFFF, crit);
@@ -541,6 +597,23 @@ public class World {
         if (hits > 0) {
             hitstop = Math.max(hitstop, p.faction == Strain.RED ? 0.05f : 0.03f);
             game.haptic(20, 120);
+        }
+        return killedAny;
+    }
+
+    /** Blue's Combo Surge finisher: a kinetic pulse around the player that staggers everything close. */
+    public void comboStunPulse(Player p, float radius, float dmg) {
+        cam.shake(9f);
+        fx.burst(p.x, p.y, 16, 300, 0.45f, 7, Palette.BLUE, 1);
+        rings.add(Ring.visual(p.x, p.y, radius));
+        for (int i = -1; i < enemies.size(); i++) {
+            Enemy e = i < 0 ? boss : enemies.get(i);
+            if (e == null || !e.alive || e.spawnT > 0) continue;
+            if (G.dist(p.x, p.y, e.x, e.y) > radius + e.r) continue;
+            lastHitWasMelee = false;
+            float dealt = e.damage(this, dmg, false);
+            addDmgText(e.x, e.y - e.r - 8, String.valueOf((int) dealt), Palette.BLUE, false);
+            if (e.alive) e.staggerT = Math.max(e.staggerT, 0.7f);
         }
     }
 

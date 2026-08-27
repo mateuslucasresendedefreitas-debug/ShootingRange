@@ -61,8 +61,80 @@ public class HeadlessSim {
             System.out.println("passive -> CRASH: " + t);
             t.printStackTrace(System.out);
         }
+        // training room: all three factions, all controls exercised, zero pressure
+        for (int faction = 0; faction < 3; faction++) {
+            try {
+                String r = playTutorial(faction);
+                System.out.println("tutorial f" + faction + " -> " + r);
+                if (!r.startsWith("OK")) failures++;
+            } catch (Throwable t) {
+                failures++;
+                System.out.println("tutorial f" + faction + " -> CRASH: " + t);
+                t.printStackTrace(System.out);
+            }
+        }
         System.out.println(failures == 0 ? "SIM: ALL RUNS OK" : "SIM FAILURES: " + failures);
         System.exit(failures == 0 ? 0 : 1);
+    }
+
+    /** Drives the training room exactly like TutorialScreen does; asserts the
+     *  step-completion counters all advance and the player never takes damage. */
+    static String playTutorial(int faction) {
+        Game game = new Game(new Context());
+        game.sfx.sfxOn = false;
+        game.sfx.musicOn = false;
+        game.save.faction = faction;
+        game.resize(1600, 720);
+        World w = new World(game, true);
+        Player p = w.player;
+
+        int redHoldFramesLeft = 0;
+        float angle = 0;
+        for (int step = 1; step <= 60 * 40; step++) {
+            angle += DT * 0.7f;
+            float mvx = (float) Math.cos(angle), mvy = (float) Math.sin(angle) * 0.6f;
+            Enemy target = w.enemies.isEmpty() ? null : w.enemies.get(0);
+            float aimx = 0, aimy = 0;
+            boolean fire = false;
+            if (target != null) {
+                float ax = target.x - p.x, ay = target.y - p.y;
+                float al = Math.max(1, G.len(ax, ay));
+                aimx = ax / al;
+                aimy = ay / al;
+                fire = true;
+            }
+            if (p.faction == 0 && redHoldFramesLeft <= 0 && step % 260 == 0) {
+                p.meleeDown();
+                redHoldFramesLeft = 40;
+            } else if (redHoldFramesLeft > 0) {
+                p.meleeHeld(DT);
+                redHoldFramesLeft--;
+                if (redHoldFramesLeft == 0) p.meleeRelease();
+            } else if (step % 22 == 0) {
+                p.meleeDown();
+            }
+            if (step % 90 == 0) p.trySkill();
+            if (step % 110 == 0) p.tryGadget();
+            if (step % 130 == 0) p.tryDose();
+
+            p.update(DT, mvx, mvy, aimx, aimy, fire);
+            w.update(DT);
+
+            if (Float.isNaN(p.x) || Float.isNaN(p.y) || Float.isNaN(p.hp)) {
+                return "NAN at step " + step;
+            }
+            if (p.hp < p.maxHp) {
+                return "TOOK DAMAGE at step " + step + " (training room must be harmless)";
+            }
+        }
+        boolean secondaryOk = faction == 0 ? p.chargeUses >= 1 : p.comboUses >= 1;
+        if (p.shotsFired < 6 || !secondaryOk || p.skillUses < 1 || p.gadgetUses < 1 || p.doseUses < 1) {
+            return "COUNTERS SHORT shots=" + p.shotsFired + " charge=" + p.chargeUses
+                    + " combo=" + p.comboUses + " skill=" + p.skillUses
+                    + " gadget=" + p.gadgetUses + " dose=" + p.doseUses;
+        }
+        return "OK shots=" + p.shotsFired + " charge=" + p.chargeUses + " combo=" + p.comboUses
+                + " skill=" + p.skillUses + " gadget=" + p.gadgetUses + " dose=" + p.doseUses;
     }
 
     static String playRun(int faction, int op, int mode, int maxSteps) {
@@ -79,6 +151,7 @@ public class HeadlessSim {
 
         int step = 0;
         float angle = 0;
+        int redHoldFramesLeft = 0;
         while (step < maxSteps) {
             step++;
             float mvx = 0, mvy = 0, aimx = 0, aimy = 0;
@@ -103,8 +176,18 @@ public class HeadlessSim {
                     aimy = ay / al;
                     fire = true;
                 }
-                // mash abilities to exercise every code path
-                if (step % 47 == 0) p.tryMelee();
+                // mash abilities to exercise every code path — fast enough (< meleeCd)
+                // that buffering + combo-window logic naturally chains green/blue finishers
+                if (p.faction == 0 && redHoldFramesLeft <= 0 && step % 260 == 0) {
+                    p.meleeDown(); // begin a red hold-charge sequence
+                    redHoldFramesLeft = 40;
+                } else if (redHoldFramesLeft > 0) {
+                    p.meleeHeld(DT);
+                    redHoldFramesLeft--;
+                    if (redHoldFramesLeft == 0) p.meleeRelease();
+                } else if (step % 22 == 0) {
+                    p.meleeDown();
+                }
                 if (step % 133 == 0) p.trySkill();
                 if (step % 171 == 0) p.tryGadget();
                 if (step % 209 == 0) p.tryDose();
