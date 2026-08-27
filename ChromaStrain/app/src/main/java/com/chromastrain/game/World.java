@@ -213,6 +213,7 @@ public class World {
         }
 
         fx.update(dt);
+        cam.shakeEnabled = game.save.shake;
         cam.update(dt, player);
     }
 
@@ -1021,6 +1022,7 @@ public class World {
     public static class Cam {
         public float x, y;
         public float shakeX, shakeY;
+        public boolean shakeEnabled = true;
         private float trauma;
         private float kickX, kickY;
 
@@ -1041,7 +1043,7 @@ public class World {
             kickX *= (1 - 8 * dt);
             kickY *= (1 - 8 * dt);
             trauma = Math.max(0, trauma - dt * 30f);
-            float t = trauma * trauma / 484f * 22f;
+            float t = shakeEnabled ? trauma * trauma / 484f * 22f : 0f;
             shakeX = G.rnd(-t, t);
             shakeY = G.rnd(-t, t);
         }

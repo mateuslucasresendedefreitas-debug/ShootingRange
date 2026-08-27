@@ -228,6 +228,13 @@ public final class Ui {
                 c.drawArc(x - s * 0.17f, y - s * 0.38f, x + s * 0.17f, y + s * 0.05f, 180, 180, false, p);
                 break;
             }
+            case 15: { // screen shake (offset frames)
+                c.drawRect(x - s * 0.36f, y - s * 0.28f, x + s * 0.20f, y + 0.20f * s, p);
+                p.setAlpha(140);
+                c.drawRect(x - s * 0.20f, y - s * 0.12f, x + s * 0.36f, y + 0.36f * s, p);
+                p.setAlpha(255);
+                break;
+            }
             default:
                 break;
         }

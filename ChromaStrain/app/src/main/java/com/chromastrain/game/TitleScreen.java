@@ -10,6 +10,7 @@ public class TitleScreen extends Screen {
     private final Ui.Btn sfxBtn = new Ui.Btn();
     private final Ui.Btn musicBtn = new Ui.Btn();
     private final Ui.Btn hapticBtn = new Ui.Btn();
+    private final Ui.Btn shakeBtn = new Ui.Btn();
     private float t;
 
     public TitleScreen(Game game) {
@@ -44,6 +45,11 @@ public class TitleScreen extends Screen {
         }
         if (hapticBtn.tapped(game.events)) {
             game.save.haptics = !game.save.haptics;
+            game.save.flush();
+            game.tapFeedback();
+        }
+        if (shakeBtn.tapped(game.events)) {
+            game.save.shake = !game.save.shake;
             game.save.flush();
             game.tapFeedback();
         }
@@ -102,6 +108,10 @@ public class TitleScreen extends Screen {
         hapticBtn.draw(c);
         Ui.icon(c, 12, bx - 168, by, 30,
                 game.save.haptics ? Palette.INK : Palette.withAlpha(Palette.INK_DIM, 90));
+        shakeBtn.set(bx - 252, by, 72, 60);
+        shakeBtn.draw(c);
+        Ui.icon(c, 15, bx - 252, by, 30,
+                game.save.shake ? Palette.INK : Palette.withAlpha(Palette.INK_DIM, 90));
 
         G.textC(c, "v1.0 — adapted from the Codex: Skills, Gadgets, Weapons & Operations",
                 cx, game.h - 14, 13, Palette.withAlpha(Palette.INK_DIM, 140));

@@ -27,6 +27,7 @@ public class RunScreen extends Screen {
     private final Ui.Btn sfxBtn = new Ui.Btn();
     private final Ui.Btn musicBtn = new Ui.Btn();
     private final Ui.Btn hapticBtn = new Ui.Btn();
+    private final Ui.Btn shakeBtn = new Ui.Btn();
     private float tutorialT = 9f;
     private boolean ended;
 
@@ -96,6 +97,10 @@ public class RunScreen extends Screen {
                 game.tapFeedback();
             } else if (hapticBtn.tapped(evs)) {
                 game.save.haptics = !game.save.haptics;
+                game.save.flush();
+                game.tapFeedback();
+            } else if (shakeBtn.tapped(evs)) {
+                game.save.shake = !game.save.shake;
                 game.save.flush();
                 game.tapFeedback();
             }
@@ -382,18 +387,23 @@ public class RunScreen extends Screen {
         abandonBtn.draw(c);
 
         // quick settings
-        sfxBtn.set(cx - 100, game.h * 0.84f, 80, 58);
+        float sy = game.h * 0.84f;
+        sfxBtn.set(cx - 150, sy, 80, 58);
         sfxBtn.label = "";
         sfxBtn.draw(c);
-        Ui.icon(c, 11, cx - 100, game.h * 0.84f, 28,
+        Ui.icon(c, 11, cx - 150, sy, 28,
                 game.save.sfx ? Palette.INK : Palette.withAlpha(Palette.INK_DIM, 90));
-        musicBtn.set(cx, game.h * 0.84f, 80, 58);
+        musicBtn.set(cx - 50, sy, 80, 58);
         musicBtn.draw(c);
-        G.textCB(c, "♪", cx, game.h * 0.84f + 9, 28,
+        G.textCB(c, "♪", cx - 50, sy + 9, 28,
                 game.save.music ? Palette.INK : Palette.withAlpha(Palette.INK_DIM, 90));
-        hapticBtn.set(cx + 100, game.h * 0.84f, 80, 58);
+        hapticBtn.set(cx + 50, sy, 80, 58);
         hapticBtn.draw(c);
-        Ui.icon(c, 12, cx + 100, game.h * 0.84f, 28,
+        Ui.icon(c, 12, cx + 50, sy, 28,
                 game.save.haptics ? Palette.INK : Palette.withAlpha(Palette.INK_DIM, 90));
+        shakeBtn.set(cx + 150, sy, 80, 58);
+        shakeBtn.draw(c);
+        Ui.icon(c, 15, cx + 150, sy, 28,
+                game.save.shake ? Palette.INK : Palette.withAlpha(Palette.INK_DIM, 90));
     }
 }

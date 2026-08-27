@@ -12,6 +12,7 @@ public class Save {
     public boolean sfx = true;
     public boolean music = true;
     public boolean haptics = true;
+    public boolean shake = true;
 
     // meta
     public int shards;          // currency
@@ -41,6 +42,7 @@ public class Save {
         sfx = sp.getBoolean("sfx", true);
         music = sp.getBoolean("music", true);
         haptics = sp.getBoolean("haptics", true);
+        shake = sp.getBoolean("shake", true);
         shards = sp.getInt("shards", 0);
         nodes = sp.getInt("nodes", 0);
         faction = sp.getInt("faction", 0);
@@ -59,6 +61,7 @@ public class Save {
         e.putBoolean("sfx", sfx);
         e.putBoolean("music", music);
         e.putBoolean("haptics", haptics);
+        e.putBoolean("shake", shake);
         e.putInt("shards", shards);
         e.putInt("nodes", nodes);
         e.putInt("faction", faction);
