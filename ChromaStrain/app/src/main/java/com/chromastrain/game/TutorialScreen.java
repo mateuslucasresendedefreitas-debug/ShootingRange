@@ -26,7 +26,7 @@ public class TutorialScreen extends Screen {
     private int step;
 
     private float moveAccum, lastX, lastY;
-    private int baseShots, baseCharge, baseCombo, baseSkill, baseGadget, baseDose;
+    private int baseShots, baseMelee, baseCharge, baseCombo, baseSkill, baseGadget, baseDose;
 
     private final Input.Stick moveStick = new Input.Stick(70);
     private final Input.Stick aimStick = new Input.Stick(70);
@@ -57,6 +57,7 @@ public class TutorialScreen extends Screen {
         step = s;
         Player p = world.player;
         baseShots = p.shotsFired;
+        baseMelee = p.meleeUses;
         baseCharge = p.chargeUses;
         baseCombo = p.comboUses;
         baseSkill = p.skillUses;
@@ -179,7 +180,9 @@ public class TutorialScreen extends Screen {
             case STEP_SECONDARY:
                 if (p.faction == Strain.RED) {
                     if (p.chargeUses - baseCharge >= 1) enterStep(STEP_SKILL);
-                } else if (p.comboUses - baseCombo >= 1) {
+                } else if (p.faction == Strain.GREEN) {
+                    if (p.comboUses - baseCombo >= 1) enterStep(STEP_SKILL);
+                } else if (p.meleeUses - baseMelee >= 1) { // blue: any Deep Spike fire is enough
                     enterStep(STEP_SKILL);
                 }
                 break;
@@ -217,11 +220,13 @@ public class TutorialScreen extends Screen {
             return "ATAQUE é seu SECUNDÁRIO — o Furybrand. Toque para um golpe rápido. "
                     + "SEGURE o botão e solte para um Golpe Carregado devastador.";
         } else if (f == Strain.GREEN) {
-            return "ATAQUE é seu SECUNDÁRIO — as Whisperfangs. Toque 3 vezes seguidas: os "
-                    + "dois primeiros são cortes rápidos, o 3º é o Corte Fantasma — avança e crita.";
+            return "ATAQUE é seu SECUNDÁRIO — as Whisperfangs, um golpe de curto alcance. Toque "
+                    + "3 vezes seguidas: os dois primeiros cortam quem estiver no caminho do seu "
+                    + "avanço, o 3º é o Corte Fantasma — avanço maior e crítico garantido.";
         } else {
-            return "ATAQUE é seu SECUNDÁRIO — as Evoclasm. Toque 3 vezes seguidas: o 3º "
-                    + "golpe do combo libera um pulso que atordoa a área.";
+            return "Você não usa corpo a corpo — ATAQUE dispara o Deep Spike, uma lança de "
+                    + "gelo do seu Glacivore que atravessa tudo na linha e congela na hora. "
+                    + "É seu SECUNDÁRIO: pesado, mas com cooldown próprio.";
         }
     }
 
@@ -254,7 +259,8 @@ public class TutorialScreen extends Screen {
         if (moveStick.active()) drawStick(c, moveStick, fcol);
         if (aimStick.active()) drawStick(c, aimStick, Palette.INK_DIM);
 
-        drawAbility(c, meleeX, meleeY, 0, fcol, p.meleeCd, 1f / Strain.MELEE[p.faction][2], -1, true);
+        int atkIcon = p.faction == Strain.BLUE ? 16 : 0;
+        drawAbility(c, meleeX, meleeY, atkIcon, fcol, p.meleeCd, 1f / Strain.MELEE[p.faction][2], -1, true);
         drawAbility(c, skillX, skillY, 1, fcol, p.skillCd, Strain.SKILL_CD[p.faction] * p.cdMul, -1, true);
         drawAbility(c, gadgetX, gadgetY, 2, fcol, p.gadgetCd, Strain.GADGET_CD[p.faction] * p.cdMul, -1, true);
         boolean doseUp = p.doseReady();
@@ -265,7 +271,7 @@ public class TutorialScreen extends Screen {
             float pulse = (float) Math.sin(game.time * 10f) * 0.5f + 0.5f;
             G.ring(c, meleeX, meleeY, btnR + 8 + pulse * 4, 3f,
                     Palette.withAlpha(Palette.GOLD, (int) (150 + 100 * pulse)));
-        } else if (p.faction != Strain.RED) {
+        } else if (p.faction == Strain.GREEN) {
             int pip = p.comboIdx % 3;
             float dotY = meleeY - btnR - 16;
             for (int i = 0; i < 3; i++) {

@@ -181,30 +181,31 @@ public final class CodexData {
             + "each swing.",
 
             // 11 green weapons
-            "NEEDLEWRAITH — Burst SMG (Silenced). 3-round bursts, effective range 15–40m.\n"
-            + "Passive, NEUROFRACTURE ROUNDS: every 3rd burst applies Neural Disrupt, "
+            "NEEDLEWRAITH — Marksman Carbine (Silenced). Deliberate, precise single shots, "
+            + "effective range 15–40m.\n"
+            + "Passive, NEUROFRACTURE ROUNDS: every 3rd aimed shot applies Neural Disrupt, "
             + "degrading enemy accuracy and speed for 5s.\n"
             + "Lightweight frame with curved organic panels; the magazine pulses with faint "
             + "bioluminescent glow. Sounds like snapping muscle fibers and low hisses of "
             + "air pressure.\n\n"
-            + "WHISPERFANGS — Twin Daggers (Very Fast). Base damage 148–164, bleed-focused.\n"
+            + "WHISPERFANGS — Twin Daggers, short-range strike. Base damage 148–164, "
+            + "bleed-focused. Not a swing — a dash-through stab that cuts everything between "
+            + "you and where you land.\n"
             + "Passive, BLOODTHREAD: critical hits apply Bleed (5 stacks max). At max stacks "
             + "the target Hemorrhages, taking increased damage from all sources.\n"
             + "Forged from fractured jadestone on a steel frame; light trails shimmer on "
             + "strike, like slicing through mist.",
 
             // 12 blue weapons
-            "GLACIVORE — Cryo-Energy Sniper Rifle. Base damage 198–225, effective range "
-            + "60–120m.\n"
+            "GLACIVORE — Cryo-Energy Sniper Rifle. Base damage 225–260, effective range "
+            + "60–120m. The Navy Colony's only weapon in the field — no melee backs it up.\n"
             + "Passive, ICE LATCH: shots apply stacking Chill (3 max). At max stacks the "
             + "target Freezes, interrupting its action and exposing it to critical hits.\n"
             + "The barrel channels cryo energy through coiled-glass veins; muzzle flash "
             + "crystallizes briefly in the air.\n\n"
-            + "EVOCLASM GAUNTLETS — Tech Gauntlets. Base damage 162–178.\n"
-            + "Passive, SYSTEM OVERCLOCK: +3% damage per active buff; the combo finisher "
-            + "stuns and disables shielded enemies.\n"
-            + "Sleek gauntlets with pulsing blue light nodes. 'Prototype brawler interface "
-            + "powered by unstable AI cores. Banned in four areas for excessive force.'",
+            + "Weapon Skill, DEEP SPIKE: fires a long-range cryo lance that pierces the "
+            + "entire line it travels and instantly Freezes everything it touches. Heavy "
+            + "damage, its own cooldown, separate from the rifle's regular fire.",
 
             // 13 red ops
             "DUNGEON — REDHOLD ARENA: a gladiatorial tower reactivated by rogue AI in "

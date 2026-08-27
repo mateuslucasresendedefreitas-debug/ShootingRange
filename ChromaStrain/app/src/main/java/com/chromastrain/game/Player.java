@@ -23,21 +23,23 @@ public class Player {
 
     // weapon state
     private float shotT;
-    private int shotCount;          // Embermaw heat cycle / burst counting
-    private int burstLeft;
-    private float burstT;
-    private int burstNumber;        // Needlewraith neurofracture cycle
+    private int shotCount;          // Embermaw heat cycle / Needlewraith neurofracture cycle
 
-    // melee — secondary attack, one distinct mechanic per strain
+    // secondary attack — one distinct mechanic per strain: red melees (tap/hold),
+    // green melees (short dash-strike combo), blue never melees at all (a ranged
+    // shot instead — see fireDeepSpike)
     public float meleeCd;
-    public int comboIdx;             // exposed for HUD combo pips
+    public int comboIdx;             // exposed for HUD combo pips (green only)
     public float swingAnim;
     private float swingAngle;
+    private float swingX0, swingY0, swingX1, swingY1;  // green: dash line, for the draw trail
     private boolean meleeBuffered;   // a tap during cooldown queues; fires the instant it clears
-    private float comboIdleT;        // resets the green/blue combo chain if you wait too long
+    private float comboIdleT;        // resets the green combo chain if you wait too long
     public float meleeHoldT;         // red: how long the attack button has been held
     public boolean meleeCharging;    // red: past the charge threshold, ready to release
     public float chargeCd;           // red: cooldown for the charged smash (separate from meleeCd)
+    public float deepSpikeFlashT;    // blue: brief muzzle-flash juice after firing Deep Spike
+    public float doseFreezeT;        // blue: Focus Shard pauses dose-meter gain for a few seconds
 
     // usage counters (tutorial step detection; harmless elsewhere)
     public int shotsFired, meleeUses, chargeUses, comboUses, skillUses, gadgetUses, doseUses;
@@ -138,6 +140,8 @@ public class Player {
         if (painEchoCd > 0) painEchoCd -= dt;
         if (hurtFlash > 0) hurtFlash -= dt;
         if (swingAnim > 0) swingAnim -= dt * 3.2f;
+        if (deepSpikeFlashT > 0) deepSpikeFlashT -= dt * 2.5f;
+        if (doseFreezeT > 0) doseFreezeT -= dt;
         if (dashT > 0) dashT -= dt;
         if (dataT > 0) {
             dataT -= dt;
@@ -174,32 +178,20 @@ public class Player {
         }
         firing = wantFire && aiming;
 
-        // firing
+        // firing — every strain fires one deliberate shot per trigger now; Red's
+        // assault rifle is simply faster than Green's marksman carbine and Blue's sniper
         if (shotT > 0) shotT -= dt;
         float rateMul = (withdrawalT > 0 && faction == Strain.GREEN) ? 0.75f : 1f;
-        if (burstLeft > 0) {
-            burstT -= dt;
-            if (burstT <= 0) {
-                burstT = 0.065f;
-                burstLeft--;
-                fireOne(burstNumber % 3 == 0 && burstLeft == 0);
-            }
-        } else if (firing && shotT <= 0) {
+        if (firing && shotT <= 0) {
             float[] gun = Strain.GUN[faction];
             shotT = 1f / (gun[2] * rateMul);
-            if (faction == Strain.GREEN) {
-                burstLeft = 3;
-                burstT = 0;
-                burstNumber++;
-            } else {
-                shotCount++;
-                fireOne(false);
-            }
+            fireOne();
         }
     }
 
-    private void fireOne(boolean neuroBurst) {
+    private void fireOne() {
         shotsFired++;
+        shotCount++;
         float[] gun = Strain.GUN[faction];
         float dmg = G.rnd(gun[0], gun[1]) * totalDmgMul();
         boolean crit = G.rnd() < critChance() || (doseT > 0 && faction == Strain.GREEN);
@@ -235,7 +227,7 @@ public class Player {
             }
         } else if (faction == Strain.GREEN) {
             sndName = "shot_green";
-            if (neuroBurst) {
+            if (shotCount % 3 == 0) { // Neurofracture Rounds — every 3rd aimed shot
                 b.disrupt = true;
                 b.color = 0xFFB8FFC8;
             }
@@ -295,40 +287,34 @@ public class Player {
     }
 
     private float comboWindow() {
-        if (faction == Strain.GREEN) return 0.65f;
-        if (faction == Strain.BLUE) return 0.85f;
-        return 0.5f;
+        return 0.65f; // green only — red never chains, blue never melees
     }
 
+    /** Routes the attack button to whichever mechanic this strain actually owns. */
     private void fireMeleeNow() {
-        float[] m = Strain.MELEE[faction];
+        meleeUses++;
+        if (faction == Strain.BLUE) {
+            fireDeepSpike();
+        } else if (faction == Strain.RED) {
+            fireCleave();
+        } else {
+            fireDashStrike();
+        }
+    }
+
+    /** RED — Furybrand: a heavy frontal cleave. Tap for a quick swing; the
+     *  charged version (hold-release) hits harder, wider and knocks back hard. */
+    private void fireCleave() {
+        float[] m = Strain.MELEE[Strain.RED];
         meleeCd = 1f / m[2];
         swingAnim = 1f;
         swingAngle = aim;
-        comboIdleT = 0;
-        comboIdx++;
-        meleeUses++;
-
-        // Green (Ghost Cut) and Blue (Combo Surge) pay off on the 3rd chained
-        // hit; Red never chains — its identity is the hold-release charge.
-        boolean finisher = faction != Strain.RED && comboIdx % 3 == 0;
 
         float dmg = G.rnd(m[0], m[1]) * totalDmgMul();
-        if (faction == Strain.RED) {
-            // Bloodfire Memory: red melee scales with missing HP
-            float missing = 1f - hp / maxHp;
-            dmg *= 1f + missing * 0.5f;
-        }
-        if (faction == Strain.BLUE) {
-            // System Overclock: +3% per active buff
-            int buffs = (doseT > 0 ? 1 : 0) + (bloomShield ? 1 : 0) + dataCharges;
-            dmg *= 1f + 0.03f * buffs;
-            if (finisher) dmg *= 1.35f; // Combo Surge payoff
-        }
-        if (faction == Strain.GREEN && finisher) dmg *= 1.4f; // Ghost Cut payoff
+        float missing = 1f - hp / maxHp;
+        dmg *= 1f + missing * 0.5f; // Bloodfire Memory
 
-        boolean crit = G.rnd() < critChance() + 0.08f || (doseT > 0 && faction == Strain.GREEN);
-        if (faction == Strain.GREEN && finisher) crit = true; // Ghost Cut always crits
+        boolean crit = G.rnd() < critChance() + 0.08f;
         if (stealthStrike) {
             crit = true;
             stealthStrike = false;
@@ -336,40 +322,14 @@ public class Player {
         }
         if (crit) dmg *= 1.8f;
 
-        if (faction == Strain.GREEN) {
-            // Whisperfangs: short dash toward aim; Ghost Cut dashes further, behind the target
-            float dashDist = finisher ? 150 : 90;
-            x += (float) Math.cos(aim) * dashDist;
-            y += (float) Math.sin(aim) * dashDist;
-            dashT = 0.15f;
-            w.clampToArenaPlayer(this);
-        }
-
-        float range = m[3] * (finisher ? 1.3f : 1f);
-        float arc = m[4] * (finisher ? 1.3f : 1f);
-        boolean killedAny = w.meleeSweep(this, aim, range, arc, dmg, crit, finisher);
-
-        if (finisher && faction == Strain.GREEN) {
-            comboUses++;
-            if (killedAny) stealthT = Math.max(stealthT, 2f); // Ghost Cut: stealth on a kill
-            w.game.sfx.play("skill_green", 0.6f, 1.3f);
-            w.fx.burst(x, y, 14, 260, 0.4f, 7, Palette.GREEN, 3);
-        }
-        if (finisher && faction == Strain.BLUE) {
-            comboUses++;
-            w.comboStunPulse(this, 145, dmg * 0.4f); // Combo Surge: kinetic stun pulse
-            w.game.sfx.play("skill_blue", 0.6f, 1.2f);
-        }
-
-        w.game.sfx.playVar(faction == Strain.RED ? "melee_red"
-                : (faction == Strain.GREEN ? "melee_green" : "melee_blue"), 0.7f);
-        w.cam.shake(faction == Strain.RED ? 7f : (finisher ? 9f : 4f));
-        w.game.haptic(finisher ? 30 : 16, finisher ? 150 : 90);
-        if (stealthT > 0) exitStealth();
+        w.meleeSweep(this, aim, m[3], m[4], dmg, crit, false);
+        w.game.sfx.playVar("melee_red", 0.7f);
+        w.cam.shake(7f);
+        w.game.haptic(16, 90);
     }
 
     private void fireChargedSmash() {
-        float[] m = Strain.MELEE[faction];
+        float[] m = Strain.MELEE[Strain.RED];
         float missing = 1f - hp / maxHp;
         float dmg = G.rnd(m[0], m[1]) * totalDmgMul() * (1f + missing * 0.5f) * 2.0f;
         boolean crit = G.rnd() < critChance() + 0.15f;
@@ -382,6 +342,90 @@ public class Player {
         w.game.sfx.play("melee_red", 1f, 0.7f);
         w.fx.burst(x, y, 22, 320, 0.6f, 10, Palette.RED, 2);
         chargeUses++;
+    }
+
+    /** GREEN — Whisperfangs: a short dash-through stab. Damage lands along the
+     *  path you cross, not a cone at the destination — you cut through whoever
+     *  is between start and end. Chain 3 for Ghost Cut: a longer dash behind
+     *  the target, guaranteed crit, and stealth on a kill. */
+    private void fireDashStrike() {
+        float[] m = Strain.MELEE[Strain.GREEN];
+        meleeCd = 1f / m[2];
+        swingAnim = 1f;
+        swingAngle = aim;
+        comboIdleT = 0;
+        comboIdx++;
+        boolean finisher = comboIdx % 3 == 0;
+
+        float dmg = G.rnd(m[0], m[1]) * totalDmgMul();
+        if (finisher) dmg *= 1.4f; // Ghost Cut payoff
+
+        boolean crit = G.rnd() < critChance() + 0.08f || (doseT > 0) || finisher;
+        if (stealthStrike) {
+            crit = true;
+            stealthStrike = false;
+            exitStealth();
+        }
+        if (crit) dmg *= 1.8f;
+
+        float dashDist = finisher ? 150 : 90;
+        swingX0 = x;
+        swingY0 = y;
+        x += (float) Math.cos(aim) * dashDist;
+        y += (float) Math.sin(aim) * dashDist;
+        dashT = 0.15f;
+        w.clampToArenaPlayer(this);
+        swingX1 = x;
+        swingY1 = y;
+
+        float thickness = finisher ? 46 : 32;
+        boolean killedAny = w.meleeLineSweep(this, swingX0, swingY0, swingX1, swingY1,
+                thickness, dmg, crit, finisher);
+
+        if (finisher) {
+            comboUses++;
+            if (killedAny) stealthT = Math.max(stealthT, 2f); // Ghost Cut: stealth on a kill
+            w.game.sfx.play("skill_green", 0.6f, 1.3f);
+            w.fx.burst(x, y, 14, 260, 0.4f, 7, Palette.GREEN, 3);
+        }
+        w.game.sfx.playVar("melee_green", 0.7f);
+        w.cam.shake(finisher ? 9f : 4f);
+        w.game.haptic(finisher ? 30 : 16, finisher ? 150 : 90);
+        if (stealthT > 0) exitStealth();
+    }
+
+    /** BLUE — Deep Spike, the Glacivore's own weapon skill: no melee at all.
+     *  A heavy piercing cryo-lance shot that passes through the whole line and
+     *  instantly freezes everything it touches. Its own cooldown, separate
+     *  from the auto-fire primary. */
+    private void fireDeepSpike() {
+        float[] m = Strain.MELEE[Strain.BLUE];
+        meleeCd = 1f / m[2];
+        float dmg = G.rnd(m[0], m[1]) * totalDmgMul();
+        boolean crit = G.rnd() < critChance() + 0.10f;
+        if (crit) dmg *= 1.8f;
+
+        Bullet b = w.obtainBullet();
+        b.fromPlayer = true;
+        b.x = x + (float) Math.cos(aim) * (r + 14);
+        b.y = y + (float) Math.sin(aim) * (r + 14);
+        float speed = 2000f;
+        b.vx = (float) Math.cos(aim) * speed;
+        b.vy = (float) Math.sin(aim) * speed;
+        b.dmg = dmg;
+        b.crit = crit;
+        b.color = 0xFFAFEFFF;
+        b.r = 16;
+        b.pierce = 30;   // "pierces armor" — passes through the whole line
+        b.chill = 3;     // instantly maxes Chill -> Freeze on everything it hits
+        b.life = 1.0f;
+
+        deepSpikeFlashT = 1f;
+        w.game.sfx.play("skill_blue", 1f, 0.75f);
+        w.cam.shake(12f);
+        w.cam.kick((float) Math.cos(aim), (float) Math.sin(aim), 8f);
+        w.fx.burst(b.x, b.y, 16, 280, 0.35f, 10, Palette.BLUE, 1);
+        w.game.haptic(35, 160);
     }
 
     public void trySkill() {
@@ -417,16 +461,23 @@ public class Player {
         if (gadgetCd > 0) return;
         gadgetCd = Strain.GADGET_CD[faction] * cdMul;
         gadgetUses++;
-        float tx = x + (float) Math.cos(aim) * 300;
-        float ty = y + (float) Math.sin(aim) * 300;
         if (faction == Strain.RED) {
+            float tx = x + (float) Math.cos(aim) * 300;
+            float ty = y + (float) Math.sin(aim) * 300;
             w.addFireZone(tx, ty, 140 * gadgetMul, 6f, 95 * totalDmgMul());
+            w.game.sfx.play("gadget", 0.9f, 1f);
         } else if (faction == Strain.GREEN) {
             w.deployDecoy(x + (float) Math.cos(aim) * 120, y + (float) Math.sin(aim) * 120, 4f);
+            w.game.sfx.play("gadget", 0.9f, 1f);
         } else {
-            w.addTrapZone(tx, ty, 150 * gadgetMul, 6f, 130 * totalDmgMul());
+            // Focus Shard: instant self-utility, no thrown zone at all —
+            // refunds skill cooldown, then briefly pauses dose-meter gain
+            skillCd = Math.max(0, skillCd - 6f);
+            doseFreezeT = 6f;
+            w.fx.burst(x, y, 20, 260, 0.5f, 7, Palette.BLUE, 3);
+            w.cam.shake(6f);
+            w.game.sfx.play("gadget", 1f, 1.35f);
         }
-        w.game.sfx.play("gadget", 0.9f, 1f);
     }
 
     public void tryDose() {
@@ -521,18 +572,15 @@ public class Player {
         c.drawLine(x + (float) Math.cos(aim) * r * 0.5f, y + (float) Math.sin(aim) * r * 0.5f, gx, gy, G.P);
         G.P.setStyle(Paint.Style.FILL);
 
-        // melee swing arc
-        if (swingAnim > 0) {
-            float[] m = Strain.MELEE[faction];
+        // secondary-attack visual — a genuinely different shape per strain, not
+        // the same arc-sweep recolored: Red cleaves a wedge, Green leaves a
+        // dash-through streak, Blue never swings at all (see the flash below).
+        if (swingAnim > 0 && faction == Strain.RED) {
+            float[] m = Strain.MELEE[Strain.RED];
             float prog = 1f - swingAnim;
-            float a0 = swingAngle - m[4] / 2 + m[4] * prog;
-            G.P.setStyle(Paint.Style.STROKE);
-            G.P.setStrokeWidth(10f * swingAnim + 2);
-            G.P.setColor(Palette.withAlpha(0xFFFFFFFF, (int) (170 * swingAnim)));
-            c.drawArc(x - m[3], y - m[3], x + m[3], y + m[3],
-                    (float) Math.toDegrees(swingAngle - m[4] / 2),
-                    (float) Math.toDegrees(m[4] * prog), false, G.P);
-            G.P.setStyle(Paint.Style.FILL);
+            drawCleaveWedge(c, m[3], m[4], prog);
+        } else if (swingAnim > 0 && faction == Strain.GREEN) {
+            drawDashStreak(c);
         }
 
         if (hurtFlash > 0) {
@@ -543,5 +591,48 @@ public class Player {
             float cg = G.clamp((meleeHoldT - 0.40f) / 0.6f, 0, 1);
             G.glow(c, x, y, r * (2.0f + cg * 1.8f), Palette.withAlpha(Palette.GOLD, (int) (90 + 130 * cg)));
         }
+        if (deepSpikeFlashT > 0) {
+            float t = deepSpikeFlashT;
+            float lx = x + (float) Math.cos(aim) * r;
+            float ly = y + (float) Math.sin(aim) * r;
+            float lx2 = x + (float) Math.cos(aim) * (r + 260 * (1f - t));
+            float ly2 = y + (float) Math.sin(aim) * (r + 260 * (1f - t));
+            G.P.setStyle(Paint.Style.STROKE);
+            G.P.setStrokeWidth(6f * t + 1.5f);
+            G.P.setColor(Palette.withAlpha(0xFFCFF6FF, (int) (220 * t)));
+            c.drawLine(lx, ly, lx2, ly2, G.P);
+            G.P.setStyle(Paint.Style.FILL);
+        }
+    }
+
+    /** Red's cleave: a filled wedge sweeping through the swing arc, thick near
+     *  the blade and glowing hot at the edge — reads as a heavy weapon, not a thin slash. */
+    private void drawCleaveWedge(Canvas c, float range, float arc, float prog) {
+        float sweep = arc * G.clamp(prog * 1.6f, 0f, 1f);
+        float a0 = swingAngle - arc / 2;
+        int fill = Palette.withAlpha(Palette.mix(Palette.RED, 0xFFFFFFFF, 0.25f),
+                (int) (150 * swingAnim));
+        G.P.setStyle(Paint.Style.FILL);
+        G.P.setColor(fill);
+        android.graphics.RectF box = new android.graphics.RectF(x - range, y - range, x + range, y + range);
+        c.drawArc(box, (float) Math.toDegrees(a0), (float) Math.toDegrees(sweep), true, G.P);
+        G.P.setStyle(Paint.Style.STROKE);
+        G.P.setStrokeWidth(3f);
+        G.P.setColor(Palette.withAlpha(Palette.GOLD, (int) (200 * swingAnim)));
+        c.drawArc(box, (float) Math.toDegrees(a0), (float) Math.toDegrees(sweep), false, G.P);
+        G.P.setStyle(Paint.Style.FILL);
+    }
+
+    /** Green's dash strike: a fading motion-streak along the line just cut through. */
+    private void drawDashStreak(Canvas c) {
+        int col = Palette.withAlpha(Palette.GREEN, (int) (220 * swingAnim));
+        G.P.setStyle(Paint.Style.STROKE);
+        G.P.setStrokeWidth(9f * swingAnim + 2);
+        G.P.setColor(col);
+        c.drawLine(swingX0, swingY0, swingX1, swingY1, G.P);
+        G.P.setStrokeWidth(2f);
+        G.P.setColor(Palette.withAlpha(0xFFFFFFFF, (int) (180 * swingAnim)));
+        c.drawLine(swingX0, swingY0, swingX1, swingY1, G.P);
+        G.P.setStyle(Paint.Style.FILL);
     }
 }

@@ -546,6 +546,54 @@ public class World {
         return landed;
     }
 
+    /** Green's short-range strike: a dash-through hit along the segment the
+     *  player just moved, not a cone at the destination — you cut through
+     *  whoever is BETWEEN start and end, matching a real gap-closing stab.
+     *  @return true if this hit killed at least one enemy. */
+    public boolean meleeLineSweep(Player p, float x0, float y0, float x1, float y1,
+                                  float thickness, float dmg, boolean crit, boolean finisher) {
+        int hits = 0;
+        boolean killedAny = false;
+        for (int i = -1; i < enemies.size(); i++) {
+            Enemy e = i < 0 ? boss : enemies.get(i);
+            if (e == null || !e.alive || e.spawnT > 0) continue;
+            if (G.pointSegDist(e.x, e.y, x0, y0, x1, y1) > thickness + e.r) continue;
+
+            lastHitWasMelee = true;
+            float dealt = e.damage(this, dmg, crit);
+            hits++;
+            if (!e.alive) killedAny = true;
+            p.meleeLifesteal(dealt);
+            addDmgText(e.x + G.rnd(-12, 12), e.y - e.r - 8, String.valueOf((int) dealt),
+                    crit ? Palette.GOLD : 0xFFFFFFFF, crit);
+            if (e.alive) {
+                if (crit) {
+                    e.applyBleed(this);
+                    if (p.setBonus) { // Jadestone Warrior: bleed spreads
+                        for (int k = 0; k < enemies.size(); k++) {
+                            Enemy o = enemies.get(k);
+                            if (o != e && o.alive && o.spawnT <= 0
+                                    && G.dist(e.x, e.y, o.x, o.y) < 150) {
+                                o.applyBleed(this);
+                            }
+                        }
+                    }
+                }
+                if (finisher) e.staggerT = Math.max(e.staggerT, 0.9f);
+                float a = G.angleTo(x0, y0, e.x, e.y);
+                e.x += (float) Math.cos(a) * 16;
+                e.y += (float) Math.sin(a) * 16;
+                if (e instanceof Minion) ((Minion) e).marked = true;
+            }
+            fx.burst(e.x, e.y, 6, 240, 0.3f, 6, Palette.GREEN, 1);
+        }
+        if (hits > 0) {
+            hitstop = Math.max(hitstop, 0.03f);
+            game.haptic(20, 120);
+        }
+        return killedAny;
+    }
+
     /** @return true if this sweep killed at least one enemy. */
     public boolean meleeSweep(Player p, float ang, float range, float arc, float dmg,
                               boolean crit, boolean finisher) {
@@ -599,22 +647,6 @@ public class World {
             game.haptic(20, 120);
         }
         return killedAny;
-    }
-
-    /** Blue's Combo Surge finisher: a kinetic pulse around the player that staggers everything close. */
-    public void comboStunPulse(Player p, float radius, float dmg) {
-        cam.shake(9f);
-        fx.burst(p.x, p.y, 16, 300, 0.45f, 7, Palette.BLUE, 1);
-        rings.add(Ring.visual(p.x, p.y, radius));
-        for (int i = -1; i < enemies.size(); i++) {
-            Enemy e = i < 0 ? boss : enemies.get(i);
-            if (e == null || !e.alive || e.spawnT > 0) continue;
-            if (G.dist(p.x, p.y, e.x, e.y) > radius + e.r) continue;
-            lastHitWasMelee = false;
-            float dealt = e.damage(this, dmg, false);
-            addDmgText(e.x, e.y - e.r - 8, String.valueOf((int) dealt), Palette.BLUE, false);
-            if (e.alive) e.staggerT = Math.max(e.staggerT, 0.7f);
-        }
     }
 
     public void bossMeleeSweep(Boss b, float ang, float range, float arc, float dmg) {

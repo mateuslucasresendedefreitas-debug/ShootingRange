@@ -127,7 +127,8 @@ public class HeadlessSim {
                 return "TOOK DAMAGE at step " + step + " (training room must be harmless)";
             }
         }
-        boolean secondaryOk = faction == 0 ? p.chargeUses >= 1 : p.comboUses >= 1;
+        boolean secondaryOk = faction == 0 ? p.chargeUses >= 1
+                : (faction == 1 ? p.comboUses >= 1 : p.meleeUses >= 1); // blue: any Deep Spike fire
         if (p.shotsFired < 6 || !secondaryOk || p.skillUses < 1 || p.gadgetUses < 1 || p.doseUses < 1) {
             return "COUNTERS SHORT shots=" + p.shotsFired + " charge=" + p.chargeUses
                     + " combo=" + p.comboUses + " skill=" + p.skillUses
@@ -205,7 +206,7 @@ public class HeadlessSim {
                 w.boss.damage(w, mode == GOD ? 300 : 220, false);
             }
             // god bot also clears stalled waves the way a player repositioning would
-            if (mode == GOD && w.state == World.STATE_WAVE && w.waveT > 90
+            if (mode == GOD && w.state == World.STATE_WAVE && w.waveT > 65
                     && !w.enemies.isEmpty() && step % 8 == 0) {
                 w.enemies.get(0).damage(w, 400, false);
             }

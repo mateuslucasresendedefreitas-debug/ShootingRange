@@ -235,6 +235,20 @@ public final class Ui {
                 p.setAlpha(255);
                 break;
             }
+            case 16: { // piercing lance — blue's ranged secondary (Deep Spike)
+                PATH.reset();
+                PATH.moveTo(x, y - s * 0.44f);
+                PATH.lineTo(x + s * 0.15f, y - s * 0.08f);
+                PATH.lineTo(x + s * 0.06f, y - s * 0.08f);
+                PATH.lineTo(x + s * 0.06f, y + s * 0.44f);
+                PATH.lineTo(x - s * 0.06f, y + s * 0.44f);
+                PATH.lineTo(x - s * 0.06f, y - s * 0.08f);
+                PATH.lineTo(x - s * 0.15f, y - s * 0.08f);
+                PATH.close();
+                p.setStyle(Paint.Style.FILL);
+                c.drawPath(PATH, p);
+                break;
+            }
             default:
                 break;
         }

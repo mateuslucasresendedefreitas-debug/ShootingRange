@@ -58,6 +58,15 @@ public final class G {
         return (float) Math.atan2(y2 - y1, x2 - x1);
     }
 
+    /** Shortest distance from a point to a line segment — used for dash-through hits. */
+    public static float pointSegDist(float px, float py, float x0, float y0, float x1, float y1) {
+        float dx = x1 - x0, dy = y1 - y0;
+        float len2 = dx * dx + dy * dy;
+        float t = len2 > 0.0001f ? ((px - x0) * dx + (py - y0) * dy) / len2 : 0f;
+        t = clamp(t, 0f, 1f);
+        return dist(px, py, x0 + dx * t, y0 + dy * t);
+    }
+
     /** Moves an angle toward another by max step, wrapping properly. */
     public static float turnToward(float a, float target, float step) {
         float d = target - a;

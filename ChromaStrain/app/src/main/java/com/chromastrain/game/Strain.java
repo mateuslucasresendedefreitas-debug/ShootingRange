@@ -42,33 +42,41 @@ public final class Strain {
 
     public static final String[] GUN_NAME = {"EMBERMAW", "NEEDLEWRAITH", "GLACIVORE"};
     public static final String[] GUN_TYPE = {
-            "Assault Rifle (Semi-Auto)", "Burst SMG (Silenced)", "Cryo-Energy Sniper"};
+            "Assault Rifle (Semi-Auto)", "Marksman Carbine (Silenced)", "Cryo-Energy Sniper"};
     public static final String[] GUN_PASSIVE = {
             "Heat Vent Cycle — every 4th shot is a piercing incendiary round (burns 4s)",
-            "Neurofracture Rounds — every 3rd burst applies Neural Disrupt (slow -10%, 5s)",
+            "Neurofracture Rounds — every 3rd shot applies Neural Disrupt (slow -10%, 5s)",
             "Ice Latch — shots stack Chill (3 max); at max: Freeze + crit vulnerability"};
 
     // dmg min/max, shots per second, projectile speed (u/s), spread (rad)
+    // Red = fast spray, Green = mid-speed precision marksman, Blue = slow true sniper —
+    // a deliberate range/rate progression instead of three guns that all just auto-fire the same way.
     public static final float[][] GUN = {
-            // dmgMin, dmgMax, rate, speed, spread, burst
+            // dmgMin, dmgMax, rate, speed, spread, unused
             {164, 202, 2.4f, 1150, 0.030f, 1},
-            {62, 76, 1.55f, 1250, 0.075f, 3},   // rate = bursts/sec
-            {198, 225, 1.05f, 1600, 0.008f, 1},
+            {170, 205, 1.3f, 1400, 0.012f, 1},
+            // Blue carries no melee at all, so the gun alone is its whole sustained
+            // damage output — hits hard per shot to make up for the slow rate.
+            {225, 260, 1.05f, 1600, 0.008f, 1},
     };
 
-    public static final String[] MELEE_NAME = {"FURYBRAND", "WHISPERFANGS", "EVOCLASM GAUNTLETS"};
+    // Red is all melee (heavy cleave, tap-fast/hold-heavy); Green pairs its marksman rifle with a
+    // short-range dash-strike; Blue carries no melee at all — its "secondary" is Deep Spike, the
+    // Glacivore's own piercing weapon skill, fired as a heavy long-range shot instead of a swing.
+    public static final String[] MELEE_NAME = {"FURYBRAND", "WHISPERFANGS", "DEEP SPIKE"};
     public static final String[] MELEE_TYPE = {
-            "Greatblade (Heavy)", "Twin Daggers (Very Fast)", "Tech Gauntlets (Combo)"};
+            "Greatblade (Heavy)", "Twin Daggers (Short Range)", "Cryo Lance Shot (Ranged)"};
     public static final String[] MELEE_PASSIVE = {
             "Bloodfire Memory — bonus power as HP drops; low HP strikes can ignite",
             "Bloodthread — crits stack Bleed (5 max); max stacks cause Hemorrhage",
-            "System Overclock — +3% damage per active buff; finisher stuns"};
+            "Piercing cryo lance — passes through the whole line and freezes on contact"};
 
-    // dmgMin, dmgMax, swings/sec, range (u), arc (rad)
+    // dmgMin, dmgMax, attacks/sec, range (u), arc (rad) — for Blue, dmg is the Deep Spike
+    // bullet's damage and attacks/sec is 1/cooldown; range/arc are unused (it's a projectile).
     public static final float[][] MELEE = {
             {221, 256, 1.05f, 180, 2.4f},
             {148, 164, 2.4f, 150, 1.7f},
-            {162, 178, 1.7f, 155, 2.0f},
+            {380, 460, 1f / 6f, 0, 0},
     };
 
     // ------------------------------------------------------------- skills
@@ -82,11 +90,13 @@ public final class Strain {
 
     // ------------------------------------------------------------- gadgets
 
-    public static final String[] GADGET_NAME = {"RED SOLVENT FLASK", "PULSE DECOY", "COGNITIVE LOOP TRAP"};
+    // Red = thrown area zone, Green = a lure/decoy, Blue = an instant self-utility —
+    // three different gadget TYPES, not three reskins of "a circle that ticks damage."
+    public static final String[] GADGET_NAME = {"RED SOLVENT FLASK", "PULSE DECOY", "FOCUS SHARD"};
     public static final String[] GADGET_DESC = {
             "Thrown flask ignites a burning zone for 6s. Seismic Fist grows +25% inside the flames.",
             "Projects a decoy that taunts enemies for 4s, then detonates in a slowing flash.",
-            "Deploys a field that zaps and staggers enemies inside it every second."};
+            "Instantly refunds 6s off your Skill cooldown. Dose meter gain pauses for 6s after."};
     public static final float[] GADGET_CD = {11f, 12f, 13f};
 
     // ------------------------------------------------------------- doses

@@ -55,10 +55,10 @@ TITLE → HUB (Operações · Lab · Codex · Upgrades, com troca de facção)
 
 | | 🔴 CRIMSON DEN (Vanguard) | 🟢 VERDANT HERD (Phantom) | 🔵 NAVY COLONY (Savant) |
 |---|---|---|---|
-| Arma | **EMBERMAW** — semi-auto; *Heat Vent Cycle*: 4º tiro incendiário perfurante | **NEEDLEWRAITH** — burst SMG; *Neurofracture*: 3º burst aplica Neural Disrupt | **GLACIVORE** — sniper cryo; *Ice Latch*: 3 Chill → Freeze + vulnerabilidade a crítico |
-| Melee | **FURYBRAND** — *Bloodfire Memory*: + dano com HP baixo, ignição | **WHISPERFANGS** — dash-strike; *Bloodthread*: crit → Bleed ×5 → **Hemorrhage** (+25% dano recebido) | **EVOCLASM** — combo ×3; *System Overclock*: +3%/buff, finisher atordoa |
+| Arma (primário) | **EMBERMAW** — rifle rápido (2.4/s); *Heat Vent Cycle*: 4º tiro incendiário perfurante | **NEEDLEWRAITH** — carabina de precisão (1.3/s, tiro único calculado); *Neurofracture*: 3º tiro aplica Neural Disrupt | **GLACIVORE** — sniper puro (1.05/s, maior alcance/dano); *Ice Latch*: 3 Chill → Freeze + vulnerabilidade a crítico |
+| Ataque (secundário) | **FURYBRAND** — cleave pesado; toque = golpe rápido, **segure e solte** = Golpe Carregado (nocaute forte); *Bloodfire Memory*: +dano com HP baixo | **WHISPERFANGS** — golpe de curto alcance: um dash-through que corta em linha (não um cone); 3 toques encadeiam o Corte Fantasma (crítico garantido + stealth em kill); *Bloodthread*: crit → Bleed ×5 → **Hemorrhage** | **Sem melee.** O botão de ataque dispara **Deep Spike**: lança perfurante do próprio Glacivore, atravessa a linha inteira e congela na hora — cooldown próprio, separado do disparo automático |
 | Skill | **Seismic Fist** — slam em área (+25% dentro de fogo; bônus vs. queimando) | **Phantom Vein** — stealth 4s, 1º golpe crítico, +50% velocidade ao sair | **Overcharge Wave** — interrompe, desorienta, enfraquece; devolve cooldown de gadget |
-| Gadget | **Red Solvent Flask** — zona de fogo 6s | **Pulse Decoy** — decoy que taunta e explode em flash lento | **Cognitive Loop Trap** — campo que zapeia/atordoa |
+| Gadget | **Red Solvent Flask** — zona de fogo 6s (área) | **Pulse Decoy** — chamariz que engana e explode em flash lento (logro) | **Focus Shard** — utilitário instantâneo: devolve 6s de cooldown da skill, pausa o ganho de dose por 6s (sem zona nenhuma) |
 | Dose | **Adrenaline Pump** — +40% dano, lifesteal melee; *withdrawal*: lento | **Bloom Rush** — todo hit crita, +25% vel.; *withdrawal*: cadência menor | **Cortex Split** — **bullet-time** (mundo a 45%); *withdrawal*: skills travadas |
 | Passiva | **Pain Echo** — <30% HP: choque retaliatório | **Spinal Bloom** — 3s sem dano: +vel., próximo hit amortecido | **Data Charge** — kills empilham +3% dano |
 

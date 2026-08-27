@@ -321,20 +321,21 @@ public class RunScreen extends Screen {
             drawStick(c, aimStick, Palette.INK_DIM);
         }
 
-        // ability buttons
-        drawAbility(c, meleeX, meleeY, 0, fcol, p.meleeCd, 1f / Strain.MELEE[p.faction][2], -1, true);
+        // ability buttons — the attack icon reflects what that button actually does now
+        int atkIcon = p.faction == Strain.BLUE ? 16 : 0;
+        drawAbility(c, meleeX, meleeY, atkIcon, fcol, p.meleeCd, 1f / Strain.MELEE[p.faction][2], -1, true);
         drawAbility(c, skillX, skillY, 1, fcol, p.skillCd, Strain.SKILL_CD[p.faction] * p.cdMul, -1, true);
         drawAbility(c, gadgetX, gadgetY, 2, fcol, p.gadgetCd, Strain.GADGET_CD[p.faction] * p.cdMul, -1, true);
         boolean doseUp = p.doseReady();
         drawAbility(c, doseX, doseY, 3, doseUp ? Palette.DOSE : Palette.INK_DIM,
                 0, 1, p.doseMeter / 100f, doseUp);
 
-        // secondary-attack identity cues: red charges, green/blue chain a combo
+        // secondary-attack identity cues: red charges, green chains a combo, blue is a plain shot
         if (p.faction == Strain.RED && p.meleeCharging) {
             float pulse = (float) Math.sin(game.time * 10f) * 0.5f + 0.5f;
             G.ring(c, meleeX, meleeY, btnR + 8 + pulse * 4, 3f,
                     Palette.withAlpha(Palette.GOLD, (int) (150 + 100 * pulse)));
-        } else if (p.faction != Strain.RED) {
+        } else if (p.faction == Strain.GREEN) {
             int pip = p.comboIdx % 3;
             float dotY = meleeY - btnR - 16;
             for (int i = 0; i < 3; i++) {
@@ -348,8 +349,8 @@ public class RunScreen extends Screen {
         if (tutorialT > 0 && world.state != World.STATE_VICTORY && world.state != World.STATE_DEFEAT) {
             int a = (int) (200 * G.clamp(tutorialT, 0, 1));
             G.textCB(c, "LEFT — MOVE", game.w * 0.22f, game.h - 40, 18, Palette.withAlpha(Palette.INK_DIM, a));
-            G.textCB(c, "RIGHT — AIM + FIRE", game.w * 0.62f, game.h - 40, 18, Palette.withAlpha(Palette.INK_DIM, a));
-            G.textR(c, "MELEE / SKILL / GADGET / DOSE", game.w - 24, game.h - btnR * 5f, 15,
+            G.textCB(c, "RIGHT — AIM + PRIMARY", game.w * 0.62f, game.h - 40, 18, Palette.withAlpha(Palette.INK_DIM, a));
+            G.textR(c, "SECONDARY / SKILL / GADGET / DOSE", game.w - 24, game.h - btnR * 5f, 15,
                     Palette.withAlpha(Palette.INK_DIM, a));
         }
 
