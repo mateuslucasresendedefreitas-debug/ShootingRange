@@ -176,7 +176,9 @@ public class Player {
         } else if (mvx != 0 || mvy != 0) {
             aim = (float) Math.atan2(mvy, mvx);
         }
-        firing = wantFire && aiming;
+        // wantFire is now driven by a dedicated PRIMARY button (hold to fire),
+        // decoupled from the aim stick — the stick only steers `aim`.
+        firing = wantFire;
 
         // firing — every strain fires one deliberate shot per trigger now; Red's
         // assault rifle is simply faster than Green's marksman carbine and Blue's sniper

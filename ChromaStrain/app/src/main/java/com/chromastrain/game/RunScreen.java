@@ -19,8 +19,11 @@ public class RunScreen extends Screen {
 
     // ability buttons (world-independent UI) — +17% over the original 46 radius
     private float btnR = 54;
+    private float primaryR = 62;
+    private float primaryX, primaryY;
     private float meleeX, meleeY, skillX, skillY, gadgetX, gadgetY, doseX, doseY;
     private int meleeHoldPointer = -1;
+    private int primaryHoldPointer = -1;
     private boolean paused;
     private final Ui.Btn resumeBtn = new Ui.Btn();
     private final Ui.Btn retryBtn = new Ui.Btn();
@@ -49,19 +52,28 @@ public class RunScreen extends Screen {
     }
 
     private void layout() {
-        float m = 26;
-        meleeX = game.w - m - btnR;
+        float m = 24;
+        // PRIMARY anchors the bottom-right corner (bigger — it's held constantly);
+        // the ability cluster (secondary/skill/gadget/dose) sits to its upper-left.
+        primaryX = game.w - m - primaryR;
+        primaryY = game.h - m - primaryR;
+
+        float gap = 34;
+        float pitch = btnR * 2.55f;
+        float clusterX = primaryX - primaryR - gap - btnR;
+        meleeX = clusterX;
         meleeY = game.h - m - btnR;
-        skillX = game.w - m - btnR * 3.5f;
-        skillY = game.h - m - btnR;
-        gadgetX = game.w - m - btnR;
-        gadgetY = game.h - m - btnR * 3.5f;
-        doseX = game.w - m - btnR * 3.0f;
-        doseY = game.h - m - btnR * 3.0f;
+        skillX = clusterX;
+        skillY = meleeY - pitch;
+        gadgetX = clusterX - pitch;
+        gadgetY = meleeY;
+        doseX = clusterX - pitch;
+        doseY = meleeY - pitch;
     }
 
     private boolean overButton(float x, float y) {
-        return G.dist(x, y, meleeX, meleeY) < btnR + 16
+        return G.dist(x, y, primaryX, primaryY) < primaryR + 16
+                || G.dist(x, y, meleeX, meleeY) < btnR + 16
                 || G.dist(x, y, skillX, skillY) < btnR + 16
                 || G.dist(x, y, gadgetX, gadgetY) < btnR + 16
                 || G.dist(x, y, doseX, doseY) < btnR + 16
@@ -121,6 +133,10 @@ public class RunScreen extends Screen {
                 continue;
             }
             if (world.player.hp > 0) {
+                if (G.dist(e.x, e.y, primaryX, primaryY) < primaryR + 16) {
+                    primaryHoldPointer = e.id;
+                    continue;
+                }
                 if (G.dist(e.x, e.y, meleeX, meleeY) < btnR + 16) {
                     world.player.meleeDown();
                     meleeHoldPointer = e.id;
@@ -158,6 +174,9 @@ public class RunScreen extends Screen {
                 meleeHoldPointer = -1;
             }
         }
+        if (primaryHoldPointer >= 0 && !(world.player.hp > 0 && game.touchDown(primaryHoldPointer))) {
+            primaryHoldPointer = -1;
+        }
 
         float mvx = moveStick.dx, mvy = moveStick.dy;
         float mlen = G.len(mvx, mvy);
@@ -171,7 +190,7 @@ public class RunScreen extends Screen {
 
         boolean alive = world.player.hp > 0;
         world.player.update(dt, alive ? mvx : 0, alive ? mvy : 0, aimStick.dx, aimStick.dy,
-                alive && aimStick.active() && aimStick.mag > 0.30f);
+                alive && primaryHoldPointer >= 0);
         world.update(dt);
 
         if (tutorialT > 0) tutorialT -= dt;
@@ -321,6 +340,17 @@ public class RunScreen extends Screen {
             drawStick(c, aimStick, Palette.INK_DIM);
         }
 
+        // PRIMARY — dedicated hold-to-fire button; the aim stick only steers now
+        boolean holding = primaryHoldPointer >= 0;
+        G.circle(c, primaryX, primaryY, primaryR, Palette.withAlpha(Palette.PANEL, 220));
+        G.ring(c, primaryX, primaryY, primaryR, 3f, Palette.withAlpha(fcol, holding ? 255 : 150));
+        Ui.icon(c, 17, primaryX, primaryY, primaryR * 0.95f, Palette.withAlpha(fcol, holding ? 255 : 190));
+        if (holding) {
+            float pulse = (float) Math.sin(game.time * 14f) * 0.5f + 0.5f;
+            G.ring(c, primaryX, primaryY, primaryR + 6 + pulse * 5, 3f,
+                    Palette.withAlpha(fcol, (int) (140 + 100 * pulse)));
+        }
+
         // ability buttons — the attack icon reflects what that button actually does now
         int atkIcon = p.faction == Strain.BLUE ? 16 : 0;
         drawAbility(c, meleeX, meleeY, atkIcon, fcol, p.meleeCd, 1f / Strain.MELEE[p.faction][2], -1, true);
@@ -349,8 +379,10 @@ public class RunScreen extends Screen {
         if (tutorialT > 0 && world.state != World.STATE_VICTORY && world.state != World.STATE_DEFEAT) {
             int a = (int) (200 * G.clamp(tutorialT, 0, 1));
             G.textCB(c, "LEFT — MOVE", game.w * 0.22f, game.h - 40, 18, Palette.withAlpha(Palette.INK_DIM, a));
-            G.textCB(c, "RIGHT — AIM + PRIMARY", game.w * 0.62f, game.h - 40, 18, Palette.withAlpha(Palette.INK_DIM, a));
-            G.textR(c, "SECONDARY / SKILL / GADGET / DOSE", game.w - 24, game.h - btnR * 5f, 15,
+            G.textCB(c, "RIGHT — AIM", game.w * 0.58f, game.h - 40, 18, Palette.withAlpha(Palette.INK_DIM, a));
+            G.textCB(c, "HOLD TO FIRE", primaryX, primaryY - primaryR - 18, 15,
+                    Palette.withAlpha(Palette.INK_DIM, a));
+            G.textR(c, "SECONDARY / SKILL / GADGET / DOSE", game.w - 24, game.h - btnR * 5.6f, 15,
                     Palette.withAlpha(Palette.INK_DIM, a));
         }
 

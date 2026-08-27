@@ -235,6 +235,17 @@ public final class Ui {
                 p.setAlpha(255);
                 break;
             }
+            case 17: { // crosshair — the dedicated PRIMARY fire button
+                p.setStyle(Paint.Style.STROKE);
+                c.drawCircle(x, y, s * 0.30f, p);
+                c.drawLine(x, y - s * 0.46f, x, y - s * 0.20f, p);
+                c.drawLine(x, y + s * 0.20f, x, y + s * 0.46f, p);
+                c.drawLine(x - s * 0.46f, y, x - s * 0.20f, y, p);
+                c.drawLine(x + s * 0.20f, y, x + s * 0.46f, y, p);
+                p.setStyle(Paint.Style.FILL);
+                c.drawCircle(x, y, s * 0.07f, p);
+                break;
+            }
             case 16: { // piercing lance — blue's ranged secondary (Deep Spike)
                 PATH.reset();
                 PATH.moveTo(x, y - s * 0.44f);

@@ -34,8 +34,11 @@ public class TutorialScreen extends Screen {
     private final float[] tX = new float[Input.MAX];
     private final float[] tY = new float[Input.MAX];
     private int meleeHoldPointer = -1;
+    private int primaryHoldPointer = -1;
 
     private final float btnR = 54;
+    private final float primaryR = 62;
+    private float primaryX, primaryY;
     private float meleeX, meleeY, skillX, skillY, gadgetX, gadgetY, doseX, doseY;
     private final Ui.Btn skipBtn = new Ui.Btn();
 
@@ -67,19 +70,26 @@ public class TutorialScreen extends Screen {
     }
 
     private void layout() {
-        float m = 26;
-        meleeX = game.w - m - btnR;
+        float m = 24;
+        primaryX = game.w - m - primaryR;
+        primaryY = game.h - m - primaryR;
+
+        float gap = 34;
+        float pitch = btnR * 2.55f;
+        float clusterX = primaryX - primaryR - gap - btnR;
+        meleeX = clusterX;
         meleeY = game.h - m - btnR;
-        skillX = game.w - m - btnR * 3.5f;
-        skillY = game.h - m - btnR;
-        gadgetX = game.w - m - btnR;
-        gadgetY = game.h - m - btnR * 3.5f;
-        doseX = game.w - m - btnR * 3.0f;
-        doseY = game.h - m - btnR * 3.0f;
+        skillX = clusterX;
+        skillY = meleeY - pitch;
+        gadgetX = clusterX - pitch;
+        gadgetY = meleeY;
+        doseX = clusterX - pitch;
+        doseY = meleeY - pitch;
     }
 
     private boolean overButton(float x, float y) {
-        return G.dist(x, y, meleeX, meleeY) < btnR + 16
+        return G.dist(x, y, primaryX, primaryY) < primaryR + 16
+                || G.dist(x, y, meleeX, meleeY) < btnR + 16
                 || G.dist(x, y, skillX, skillY) < btnR + 16
                 || G.dist(x, y, gadgetX, gadgetY) < btnR + 16
                 || G.dist(x, y, doseX, doseY) < btnR + 16
@@ -112,6 +122,10 @@ public class TutorialScreen extends Screen {
             Input.Ev e = evs.get(i);
             if (e.type != 0) continue;
             if (e.x > game.w - 96 && e.y < 96) continue; // reserved for skip button
+            if (G.dist(e.x, e.y, primaryX, primaryY) < primaryR + 16) {
+                primaryHoldPointer = e.id;
+                continue;
+            }
             if (G.dist(e.x, e.y, meleeX, meleeY) < btnR + 16) {
                 p.meleeDown();
                 meleeHoldPointer = e.id;
@@ -148,6 +162,9 @@ public class TutorialScreen extends Screen {
                 meleeHoldPointer = -1;
             }
         }
+        if (primaryHoldPointer >= 0 && !game.touchDown(primaryHoldPointer)) {
+            primaryHoldPointer = -1;
+        }
 
         float mvx = moveStick.dx, mvy = moveStick.dy;
         float mlen = G.len(mvx, mvy);
@@ -157,8 +174,7 @@ public class TutorialScreen extends Screen {
         }
         if (mlen < 0.12f) mvx = mvy = 0;
 
-        p.update(dt, mvx, mvy, aimStick.dx, aimStick.dy,
-                aimStick.active() && aimStick.mag > 0.30f);
+        p.update(dt, mvx, mvy, aimStick.dx, aimStick.dy, primaryHoldPointer >= 0);
         world.update(dt);
 
         moveAccum += G.dist(p.x, p.y, lastX, lastY);
@@ -236,8 +252,8 @@ public class TutorialScreen extends Screen {
             case STEP_MOVE:
                 return "Arraste o lado ESQUERDO da tela para se mover pela sala.";
             case STEP_PRIMARY:
-                return "Arraste o lado DIREITO para mirar — seu ATAQUE PRIMÁRIO (a arma) "
-                        + "dispara sozinho enquanto você mira num alvo.";
+                return "Arraste o lado DIREITO para mirar. SEGURE o botão ATIRAR para disparar "
+                        + "seu ATAQUE PRIMÁRIO (a arma) na direção que você está mirando.";
             case STEP_SECONDARY:
                 return secondaryText();
             case STEP_SKILL:
@@ -258,6 +274,16 @@ public class TutorialScreen extends Screen {
 
         if (moveStick.active()) drawStick(c, moveStick, fcol);
         if (aimStick.active()) drawStick(c, aimStick, Palette.INK_DIM);
+
+        boolean holding = primaryHoldPointer >= 0;
+        G.circle(c, primaryX, primaryY, primaryR, Palette.withAlpha(Palette.PANEL, 220));
+        G.ring(c, primaryX, primaryY, primaryR, 3f, Palette.withAlpha(fcol, holding ? 255 : 150));
+        Ui.icon(c, 17, primaryX, primaryY, primaryR * 0.95f, Palette.withAlpha(fcol, holding ? 255 : 190));
+        if (holding) {
+            float pulse = (float) Math.sin(game.time * 14f) * 0.5f + 0.5f;
+            G.ring(c, primaryX, primaryY, primaryR + 6 + pulse * 5, 3f,
+                    Palette.withAlpha(fcol, (int) (140 + 100 * pulse)));
+        }
 
         int atkIcon = p.faction == Strain.BLUE ? 16 : 0;
         drawAbility(c, meleeX, meleeY, atkIcon, fcol, p.meleeCd, 1f / Strain.MELEE[p.faction][2], -1, true);
