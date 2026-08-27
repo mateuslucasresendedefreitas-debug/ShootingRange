@@ -34,16 +34,14 @@ public final class Ui {
             return px >= x - w / 2 && px <= x + w / 2 && py >= y - h / 2 && py <= y + h / 2;
         }
 
-        /** Consumes a tap-down within bounds. */
+        /** Consumes a tap-down within bounds. Fires for disabled buttons too —
+         *  callers check {@code enabled} to give deny feedback. */
         public boolean tapped(ArrayList<Input.Ev> events) {
             for (int i = 0; i < events.size(); i++) {
                 Input.Ev e = events.get(i);
                 if (e.type == 0 && contains(e.x, e.y)) {
-                    if (enabled) {
-                        pressT = 1f;
-                        return true;
-                    }
-                    return false;
+                    if (enabled) pressT = 1f;
+                    return true;
                 }
             }
             return false;

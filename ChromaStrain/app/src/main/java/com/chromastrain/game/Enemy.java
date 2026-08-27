@@ -41,6 +41,9 @@ public class Enemy {
     public float critVulnT;      // after freeze: +crit damage taken
     public float weakenT;        // deals less damage (overcharge wave)
 
+    // hit bookkeeping
+    public int lastBulletId = -1;
+
     // ai
     public float atkCd;
     public float windup;         // telegraph timer for brute charge / spitter volley
@@ -64,6 +67,7 @@ public class Enemy {
         burnT = 0; burnDps = 0; bleedStacks = 0; bleedT = 0; hemorrhage = false; hemoT = 0;
         chillStacks = 0; chillT = 0; frozenT = 0; disruptT = 0; staggerT = 0; disorientT = 0;
         critVulnT = 0; weakenT = 0; atkCd = G.rnd(0.4f, 1.4f); windup = 0; chargeT = 0;
+        lastBulletId = -1;
         shieldHp = 0; hitFlash = 0; spawnT = 0.5f;
         wanderA = G.rnd(0, 6.28f);
         phaseSeed = G.rnd(0, 100f);
@@ -325,8 +329,9 @@ public class Enemy {
         y += vy * dt;
         w.clampToArena(this);
 
-        // contact damage
-        if (distP < r + p.r && frozenT <= 0) {
+        // contact damage — always against the real player, never the decoy
+        float distPlayer = G.dist(x, y, p.x, p.y);
+        if (distPlayer < r + p.r && frozenT <= 0) {
             float dd = contactDmg * w.enemyDmgMul * damageDealtMul();
             if (type == BRUTE && chargeT > 0) dd *= 1.6f;
             if (w.hurtPlayer(dd, x, y) && type == BRUTE) {

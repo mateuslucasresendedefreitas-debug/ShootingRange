@@ -13,6 +13,9 @@ public class RunScreen extends Screen {
 
     private final Input.Stick moveStick = new Input.Stick(70);
     private final Input.Stick aimStick = new Input.Stick(70);
+    private final boolean[] tDown = new boolean[Input.MAX];
+    private final float[] tX = new float[Input.MAX];
+    private final float[] tY = new float[Input.MAX];
 
     // ability buttons (world-independent UI)
     private float btnR = 46;
@@ -119,12 +122,9 @@ public class RunScreen extends Screen {
             }
         }
 
-        boolean[] down = new boolean[Input.MAX];
-        float[] tx = new float[Input.MAX];
-        float[] ty = new float[Input.MAX];
-        game.input.snapshot(down, tx, ty);
-        moveStick.track(down, tx, ty);
-        aimStick.track(down, tx, ty);
+        game.input.snapshot(tDown, tX, tY);
+        moveStick.track(tDown, tX, tY);
+        aimStick.track(tDown, tX, tY);
 
         float mvx = moveStick.dx, mvy = moveStick.dy;
         float mlen = G.len(mvx, mvy);
@@ -148,10 +148,14 @@ public class RunScreen extends Screen {
                 && world.stateT <= 0) {
             ended = true;
             boolean victory = world.state == World.STATE_VICTORY;
+            // capture reward/record facts BEFORE the save is mutated
+            int shards = rewardShards(victory);
+            int nodes = rewardNodes(victory);
+            boolean newBest = victory && world.score > game.save.best[opId];
+            boolean nextWasLocked = Ops.slot(opId) < 2 && !game.save.opUnlocked(opId + 1);
             applyRewards(victory);
             game.switchTo(new ResultScreen(game, opId, victory, world.score, world.kills,
-                    (int) world.elapsed, rewardShards(victory), rewardNodes(victory),
-                    world.score > game.save.best[opId]));
+                    (int) world.elapsed, shards, nodes, newBest, victory && nextWasLocked));
         }
     }
 

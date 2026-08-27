@@ -461,7 +461,8 @@ public class Boss extends Enemy {
             atkT = 1.0f; // telegraph
         }
         if (state == 1) {
-            atkT -= dt;
+            // atkT already ticks in the shared update — a second decrement here
+            // would halve the telegraph window
             vx *= 0.9f;
             vy *= 0.9f;
             if (atkT <= 0) {

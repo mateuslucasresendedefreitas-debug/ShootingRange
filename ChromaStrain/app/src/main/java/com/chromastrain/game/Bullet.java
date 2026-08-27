@@ -17,10 +17,10 @@ public class Bullet {
     public boolean disrupt;     // Needlewraith neurofracture payload
     public boolean heavy;       // enemy heavy shot (bigger telegraph)
     public float slowFrac;      // enemy chilling shots etc.
-    public Enemy lastHit;       // avoids double-hitting the same target on pierce
+    public int id;              // unique serial; enemies remember it so one
+                                // piercing bullet never hits them twice
 
     public void reset() {
-        lastHit = null;
         alive = true;
         fromPlayer = false;
         crit = false;

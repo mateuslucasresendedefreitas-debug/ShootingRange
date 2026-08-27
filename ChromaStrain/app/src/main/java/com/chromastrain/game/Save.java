@@ -75,9 +75,8 @@ public class Save {
 
     /** Highest op unlocked for a faction: trial always; raid after trial; hunt after raid. */
     public boolean opUnlocked(int opId) {
-        int slot = opId % 3; // 0 trial, 1 raid, 2 hunt (per faction block)
-        if (slot == 0) return true;
-        int factionBase = (opId / 3) * 3;
-        return cleared[factionBase + slot - 1];
+        int slot = Ops.slot(opId);
+        if (slot == Ops.SLOT_TRIALS) return true;
+        return cleared[Ops.faction(opId) * 3 + slot - 1];
     }
 }

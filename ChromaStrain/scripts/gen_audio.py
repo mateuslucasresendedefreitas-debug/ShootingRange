@@ -274,7 +274,8 @@ def sparkle(dur, dens, fmin, fmax, amp=0.3):
         f = rng.uniform(fmin, fmax)
         ln = int(SR * rng.uniform(0.15, 0.4))
         seg = np.sin(2 * np.pi * f * np.arange(ln) / SR) * env(ln, 0.01, 0.3, 2)
-        out[off:off + ln] += seg * amp * rng.uniform(0.4, 1)
+        seg = seg[: len(out) - off]  # clamp tails that would run past the loop
+        out[off:off + len(seg)] += seg * amp * rng.uniform(0.4, 1)
     return out
 
 

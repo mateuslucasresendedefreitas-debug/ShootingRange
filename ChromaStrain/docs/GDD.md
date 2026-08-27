@@ -99,13 +99,31 @@ TITLE → HUB (Operações · Lab · Codex · Upgrades, com troca de facção)
   - `Gradle/AGP 8` (Android Studio ou CI) — padrão;
   - `scripts/build_apk.py` — pipeline **sem Android SDK** (aapt2 do Apktool + android-all do Robolectric + dx + uber-apk-signer), usado para gerar o `dist/ChromaStrain-debug.apk` deste repositório em ambiente sem acesso ao SDK.
 
-## 6. O que ficou de fora (escopo consciente)
+## 6. Validação e balanceamento por simulação
+
+Um harness headless (`tests/headless` + `scripts/run_sim.sh`) roda o jogo real na JVM
+com stubs no lugar das classes Android e um bot jogando:
+
+- **Varredura god-mode**: o bot vence as **27 combinações** (3 facções × 9 operações),
+  levando **todos os 9 scripts de boss do spawn à morte** — fases, clones da Priestess,
+  Mirror Thorns, zonas de vírus, echo turrets, beam do Scion, ciclos de dose (incluindo
+  o bullet-time azul). Resultado: **zero crashes**.
+- **Telemetria mortal**: o mesmo bot, mortal e sem desviar de nada, morre nas waves 2–4 —
+  piso de dificuldade saudável (um humano desvia, usa stealth reativo e upgrades).
+- **Caminho de derrota**: bot passivo morre na wave 1 como esperado.
+
+O tuning da v1 saiu desses dados: dano inimigo do tier TRIALS reduzido (×0.9),
+volatile mais suave, *anti-stall* nos spitters (param de kitar após 55s de wave),
+dose carrega mais rápido (+12/kill), kit verde com +6% de velocidade base e
+Spinal Bloom absorvendo 40%.
+
+## 7. O que ficou de fora (escopo consciente)
 
 - Skills não implementadas viraram lore no codex (Shockspike/Thermal/Mist/Scentbreaker/Focus Shard/Dissonance/Neural Lock citados nas entradas) — slots de expansão natural.
 - Multiplayer/raids em grupo → bosses single-player com as mesmas mecânicas.
 - Sets de equipamento (Ashblood Forge etc.) → candidato a v1.1 (sistema de loot).
 
-## 7. Roadmap sugerido
+## 8. Roadmap sugerido
 
 1. **v1.1** — sistema de loot com os Set Bonuses do codex; 2ª skill por facção (Synapse Surge, Neural Lock); daily ops.
 2. **v1.2** — modo endless com leaderboard local; conquistas ("Field Researcher": ler todo o codex).

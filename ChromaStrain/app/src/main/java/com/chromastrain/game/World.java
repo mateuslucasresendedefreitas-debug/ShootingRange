@@ -132,6 +132,7 @@ public class World {
         }
 
         if (state == STATE_WAVE) waveT += wdt;
+        if (beamHurtCd > 0) beamHurtCd -= wdt;
         updateModifiers(wdt);
         updateStates(dt);
 
@@ -396,9 +397,12 @@ public class World {
 
     // =============================================================== combat
 
+    private int bulletSerial;
+
     public Bullet obtainBullet() {
         Bullet b = bulletPool.isEmpty() ? new Bullet() : bulletPool.remove(bulletPool.size() - 1);
         b.reset();
+        b.id = ++bulletSerial;
         bullets.add(b);
         return b;
     }
@@ -420,14 +424,14 @@ public class World {
     private boolean collideBullet(Bullet b) {
         if (b.fromPlayer) {
             Enemy hit = null;
-            if (boss != null && boss.alive && boss != b.lastHit
+            if (boss != null && boss.alive && boss.lastBulletId != b.id
                     && G.dist(b.x, b.y, boss.x, boss.y) < b.r + boss.r) {
                 hit = boss;
             }
             if (hit == null) {
                 for (int i = 0; i < enemies.size(); i++) {
                     Enemy e = enemies.get(i);
-                    if (e == b.lastHit || e.spawnT > 0) continue;
+                    if (e.lastBulletId == b.id || e.spawnT > 0) continue;
                     if (G.dist(b.x, b.y, e.x, e.y) < b.r + e.r) {
                         hit = e;
                         break;
@@ -454,7 +458,7 @@ public class World {
             if (b.crit && player.faction == Strain.GREEN) hit.applyBleed(this);
             if (b.crit) hitstop = Math.max(hitstop, 0.025f);
 
-            b.lastHit = hit;
+            hit.lastBulletId = b.id;
             if (b.pierce > 0) {
                 b.pierce--;
                 return false;
@@ -742,13 +746,12 @@ public class World {
         game.sfx.play("boss_roar", 0.5f, 1.6f);
     }
 
-    private float beamHurtCd;
+    public float beamHurtCd;
 
-    /** Continuous beam: ticks damage on its own cadence, independent of iframes. */
+    /** Continuous beam: ticks damage on its own cadence, independent of iframes.
+     *  The cooldown decays in updateModifiers on world (dilated) time so the
+     *  blue dose does not multiply beam ticks. */
     public void beamDamage(Boss b, float ang, float len, float dmgPerTick) {
-        if (beamHurtCd > 0) {
-            beamHurtCd -= 1f / 60f;
-        }
         float px = player.x - b.x, py = player.y - b.y;
         float dx = (float) Math.cos(ang), dy = (float) Math.sin(ang);
         float t = G.clamp(px * dx + py * dy, 0, len);
@@ -1298,6 +1301,9 @@ public class World {
                 y += Math.sin(wanderA) * speed * dt;
                 if (G.rnd() < dt) wanderA += G.rnd(-1.5f, 1.5f);
                 w.clampToArena(this);
+                if (G.dist(x, y, p.x, p.y) < r + p.r) {
+                    w.hurtPlayer(contactDmg * w.enemyDmgMul, x, y);
+                }
             } else if (kind == THORN) {
                 x += Math.cos(ang) * speed * dt;
                 y += Math.sin(ang) * speed * dt;

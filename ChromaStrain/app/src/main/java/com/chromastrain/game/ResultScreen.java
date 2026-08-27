@@ -13,10 +13,12 @@ public class ResultScreen extends Screen {
     private final Ui.Btn hubBtn = new Ui.Btn();
     private final Ui.Btn nextBtn = new Ui.Btn();
     private float t;
-    private final boolean unlockedNext;
+    private final boolean unlockedNext;   // newly unlocked THIS run (stat line)
+    private final boolean showNext;       // next op is playable (nav button)
 
     public ResultScreen(Game game, int opId, boolean victory, int score, int kills,
-                        int seconds, int shards, int nodes, boolean newBest) {
+                        int seconds, int shards, int nodes, boolean newBest,
+                        boolean unlockedNext) {
         super(game);
         this.opId = opId;
         this.victory = victory;
@@ -26,7 +28,8 @@ public class ResultScreen extends Screen {
         this.shards = shards;
         this.nodes = nodes;
         this.newBest = newBest && victory;
-        unlockedNext = victory && Ops.slot(opId) < 2;
+        this.unlockedNext = unlockedNext;
+        showNext = victory && Ops.slot(opId) < 2 && game.save.opUnlocked(opId + 1);
     }
 
     @Override
@@ -46,7 +49,7 @@ public class ResultScreen extends Screen {
         } else if (hubBtn.tapped(game.events)) {
             game.tapFeedback();
             game.switchTo(new HubScreen(game, 0));
-        } else if (unlockedNext && nextBtn.tapped(game.events)) {
+        } else if (showNext && nextBtn.tapped(game.events)) {
             game.tapFeedback();
             game.switchTo(new RunScreen(game, opId + 1));
         }
@@ -90,13 +93,13 @@ public class ResultScreen extends Screen {
         }
 
         float by = game.h * 0.87f;
-        retryBtn.set(cx - (unlockedNext ? 250 : 130), by, 230, 64);
+        retryBtn.set(cx - (showNext ? 250 : 130), by, 230, 64);
         retryBtn.label = victory ? "REPLAY" : "RETRY";
         retryBtn.color = Palette.withAlpha(col, 36);
         retryBtn.edge = col;
         retryBtn.draw(c);
 
-        if (unlockedNext) {
+        if (showNext) {
             nextBtn.set(cx, by, 230, 64);
             nextBtn.label = "NEXT OP";
             nextBtn.color = Palette.withAlpha(Strain.color(f), 60);
@@ -104,7 +107,7 @@ public class ResultScreen extends Screen {
             nextBtn.draw(c);
         }
 
-        hubBtn.set(cx + (unlockedNext ? 250 : 130), by, 230, 64);
+        hubBtn.set(cx + (showNext ? 250 : 130), by, 230, 64);
         hubBtn.label = "HANGAR";
         hubBtn.draw(c);
     }
