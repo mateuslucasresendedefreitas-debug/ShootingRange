@@ -24,6 +24,9 @@ public class RunScreen extends Screen {
     private final Ui.Btn resumeBtn = new Ui.Btn();
     private final Ui.Btn retryBtn = new Ui.Btn();
     private final Ui.Btn abandonBtn = new Ui.Btn();
+    private final Ui.Btn sfxBtn = new Ui.Btn();
+    private final Ui.Btn musicBtn = new Ui.Btn();
+    private final Ui.Btn hapticBtn = new Ui.Btn();
     private float tutorialT = 9f;
     private boolean ended;
 
@@ -81,6 +84,20 @@ public class RunScreen extends Screen {
             } else if (abandonBtn.tapped(evs)) {
                 game.tapFeedback();
                 exitToHub(false);
+            } else if (sfxBtn.tapped(evs)) {
+                game.save.sfx = !game.save.sfx;
+                game.sfx.sfxOn = game.save.sfx;
+                game.save.flush();
+                game.tapFeedback();
+            } else if (musicBtn.tapped(evs)) {
+                game.save.music = !game.save.music;
+                game.sfx.setMusicOn(game.save.music);
+                game.save.flush();
+                game.tapFeedback();
+            } else if (hapticBtn.tapped(evs)) {
+                game.save.haptics = !game.save.haptics;
+                game.save.flush();
+                game.tapFeedback();
             }
             return;
         }
@@ -363,5 +380,20 @@ public class RunScreen extends Screen {
         abandonBtn.label = "ABANDON";
         abandonBtn.textColor = Palette.DANGER;
         abandonBtn.draw(c);
+
+        // quick settings
+        sfxBtn.set(cx - 100, game.h * 0.84f, 80, 58);
+        sfxBtn.label = "";
+        sfxBtn.draw(c);
+        Ui.icon(c, 11, cx - 100, game.h * 0.84f, 28,
+                game.save.sfx ? Palette.INK : Palette.withAlpha(Palette.INK_DIM, 90));
+        musicBtn.set(cx, game.h * 0.84f, 80, 58);
+        musicBtn.draw(c);
+        G.textCB(c, "♪", cx, game.h * 0.84f + 9, 28,
+                game.save.music ? Palette.INK : Palette.withAlpha(Palette.INK_DIM, 90));
+        hapticBtn.set(cx + 100, game.h * 0.84f, 80, 58);
+        hapticBtn.draw(c);
+        Ui.icon(c, 12, cx + 100, game.h * 0.84f, 28,
+                game.save.haptics ? Palette.INK : Palette.withAlpha(Palette.INK_DIM, 90));
     }
 }
