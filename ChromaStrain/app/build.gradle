@@ -1,0 +1,30 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.chromastrain.game'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.chromastrain.game"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+// Pure Android framework game — zero dependencies on purpose:
+// tiny APK, no AndroidX, everything drawn/synthesized procedurally.
