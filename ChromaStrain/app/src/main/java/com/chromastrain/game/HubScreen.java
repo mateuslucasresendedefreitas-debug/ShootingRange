@@ -420,6 +420,11 @@ public class HubScreen extends Screen {
         float y0 = topH + 10;
         float cardH = (game.h - topH - botH - 40) / 3f;
         G.textB(c, Strain.FACTION[f] + " — " + Strain.CLASS_LINE[f], 24, y0 + 8, 16, Palette.INK_DIM);
+        if (!game.save.tutorialSeen) {
+            float pulse = (float) Math.sin(t * 5f) * 0.5f + 0.5f;
+            G.textB(c, "▲ TAP TO SWITCH STRAIN — EACH ONE PLAYS DIFFERENTLY", 470, y0 + 8, 15,
+                    Palette.withAlpha(Strain.color(f), (int) (140 + 110 * pulse)));
+        }
         for (int s = 0; s < 3; s++) {
             int opId = f * 3 + s;
             float cy = y0 + 18 + s * (cardH + 6);

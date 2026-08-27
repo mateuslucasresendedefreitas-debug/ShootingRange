@@ -139,6 +139,11 @@ public class Player {
         boolean aiming = G.len(aimX, aimY) > 0.30f;
         if (aiming) {
             aim = (float) Math.atan2(aimY, aimX);
+            // gentle magnetism: pull toward a target that is almost on the reticle
+            Enemy near = w.nearestEnemyInCone(x, y, aim, 620, 0.16f);
+            if (near != null) {
+                aim = G.turnToward(aim, G.angleTo(x, y, near.x, near.y), 0.09f);
+            }
         } else if (mvx != 0 || mvy != 0) {
             aim = (float) Math.atan2(mvy, mvx);
         }

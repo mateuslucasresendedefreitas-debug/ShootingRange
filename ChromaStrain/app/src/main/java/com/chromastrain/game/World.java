@@ -811,6 +811,25 @@ public class World {
         }
     }
 
+    /** Closest living enemy (boss included) within an angular cone of the aim. */
+    public Enemy nearestEnemyInCone(float x, float y, float aimAng, float maxDist, float halfCone) {
+        Enemy best = null;
+        float bestD = maxDist;
+        for (int i = -1; i < enemies.size(); i++) {
+            Enemy e = i < 0 ? boss : enemies.get(i);
+            if (e == null || !e.alive || e.spawnT > 0) continue;
+            float d = G.dist(x, y, e.x, e.y);
+            if (d > bestD) continue;
+            float diff = G.angleTo(x, y, e.x, e.y) - aimAng;
+            while (diff > Math.PI) diff -= (float) (Math.PI * 2);
+            while (diff < -Math.PI) diff += (float) (Math.PI * 2);
+            if (Math.abs(diff) > halfCone) continue;
+            best = e;
+            bestD = d;
+        }
+        return best;
+    }
+
     private void spawnPickup(float x, float y, int kind, int amount) {
         Pickup p = new Pickup();
         p.x = G.clamp(x, 60, arenaW - 60);

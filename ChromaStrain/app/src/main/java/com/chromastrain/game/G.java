@@ -179,13 +179,27 @@ public final class G {
         P.setStyle(Paint.Style.FILL);
     }
 
-    /** Soft additive-looking glow via radial gradient (no blur filters — fast). */
+    private static final java.util.HashMap<Integer, Paint> GLOW_CACHE =
+            new java.util.HashMap<Integer, Paint>();
+
+    /** Soft additive-looking glow via cached radial gradients (no per-frame allocs). */
     public static void glow(Canvas c, float x, float y, float r, int color) {
-        P.setStyle(Paint.Style.FILL);
-        int core = Palette.withAlpha(color, Math.min(230, android.graphics.Color.alpha(color) + 60));
-        P.setShader(new RadialGradient(x, y, r, core, Palette.withAlpha(color, 0), Shader.TileMode.CLAMP));
-        c.drawCircle(x, y, r, P);
-        P.setShader(null);
+        Paint p = GLOW_CACHE.get(Integer.valueOf(color));
+        if (p == null) {
+            if (GLOW_CACHE.size() > 96) GLOW_CACHE.clear();
+            p = new Paint(Paint.ANTI_ALIAS_FLAG);
+            int core = Palette.withAlpha(color,
+                    Math.min(230, android.graphics.Color.alpha(color) + 60));
+            p.setShader(new RadialGradient(0, 0, 64, core,
+                    Palette.withAlpha(color, 0), Shader.TileMode.CLAMP));
+            GLOW_CACHE.put(Integer.valueOf(color), p);
+        }
+        c.save();
+        c.translate(x, y);
+        float s = r / 64f;
+        c.scale(s, s);
+        c.drawCircle(0, 0, 64, p);
+        c.restore();
     }
 
     public static void rr(Canvas c, float l, float t, float r, float b, float rad, int color) {
