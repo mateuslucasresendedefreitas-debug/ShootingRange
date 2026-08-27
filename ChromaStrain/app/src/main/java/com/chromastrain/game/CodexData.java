@@ -28,10 +28,11 @@ public final class CodexData {
             "VERDANT OPERATIONS",                // 14
             "NAVY OPERATIONS",                   // 15
             "CULTIVATION PRIMER",                // 16
+            "FORGED SETS",                       // 17
     };
 
     public static final int[] FACTION = {
-            -1, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, -1
+            -1, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, -1, -1
     };
 
     public static final String[] BODY = {
@@ -258,6 +259,18 @@ public final class CodexData {
             + "Correct cultivations refine STABILIZED DOSES — you deploy on your next "
             + "operation already dosed. The strain profiles in this codex list every valid "
             + "stimulus. Study them.",
+
+            // 17 forged sets
+            "Champions who survive a faction's BOSS HUNT return changed. The armorers "
+            + "study what the hunt did to their gear and bind it into a permanent set — "
+            + "the hunt is the forge.\n\n"
+            + "ASHBLOOD FORGE (Crimson Den) — quenched in Nuka's rage. +10% burn damage; "
+            + "kills on burning enemies vent a second off Seismic Fist's cycle.\n\n"
+            + "JADESTONE WARRIOR (Verdant Herd) — cut from the Clothwalker's silence. "
+            + "Bleeds last 25% longer, and dagger crits spread Bleed to enemies nearby.\n\n"
+            + "MIND'S ANCHOR (Navy Colony) — annealed against the Code Swarm. Chilled "
+            + "targets take +12% damage; Frozen targets take +15%.\n\n"
+            + "A forged set is permanent and always active while running its strain.",
     };
 
     public static final int COUNT = TITLE.length;
