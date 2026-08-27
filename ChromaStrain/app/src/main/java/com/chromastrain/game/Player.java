@@ -13,7 +13,7 @@ public class Player {
     public float aim;               // radians
     public boolean firing;
     public float hp, maxHp;
-    public float baseSpeed = 340;
+    public float baseSpeed = 340;   // green runs slightly hotter (set in ctor)
 
     // upgrade-derived
     public float dmgMul = 1f;
@@ -60,6 +60,7 @@ public class Player {
     public Player(World w, int faction, Save save) {
         this.w = w;
         this.faction = faction;
+        if (faction == Strain.GREEN) baseSpeed = 360;
         maxHp = 1000 * (1f + 0.12f * save.up[0]);
         hp = maxHp;
         dmgMul = 1f + 0.08f * save.up[1];
@@ -338,7 +339,7 @@ public class Player {
     }
 
     public void onKill() {
-        doseMeter = Math.min(100, doseMeter + 9);
+        doseMeter = Math.min(100, doseMeter + 12);
         if (faction == Strain.BLUE) {
             dataCharges = Math.min(5, dataCharges + 1);
             dataT = 6f;
@@ -352,12 +353,12 @@ public class Player {
         float a = amount;
         if (doseT > 0 && faction == Strain.RED) a *= 0.8f;
         if (bloomShield) {
-            a *= 0.7f;
+            a *= 0.6f;
             bloomShield = false;
         }
         sinceHurt = 0;
         hp -= a;
-        iframes = 0.5f;
+        iframes = 0.55f;
         hurtFlash = 0.3f;
         w.game.sfx.playVar("hurt", 0.9f);
         w.game.haptic(40, 180);

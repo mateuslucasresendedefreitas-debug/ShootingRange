@@ -78,7 +78,7 @@ public final class Ops {
 
     /** Difficulty tier per slot (hp/damage scaling). */
     public static final float[] TIER_HP = {1.0f, 1.9f, 2.9f};
-    public static final float[] TIER_DMG = {1.0f, 1.35f, 1.7f};
+    public static final float[] TIER_DMG = {0.9f, 1.3f, 1.65f};
     public static final int[] REWARD_SHARDS = {140, 260, 400};
 
     public static int faction(int op) {

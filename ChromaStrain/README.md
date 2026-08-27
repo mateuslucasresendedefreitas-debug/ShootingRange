@@ -52,6 +52,15 @@ python3 ChromaStrain/scripts/build_apk.py
 
 Tools are downloaded automatically into `ChromaStrain/tools/` on first run.
 
+### Headless gameplay test
+A bot plays **every operation with every faction** on the JVM (Android classes
+shadowed by lightweight stubs) — all nine boss scripts are driven from spawn to
+death, plus mortal-difficulty telemetry and the defeat path:
+
+```bash
+bash ChromaStrain/scripts/run_sim.sh   # expects "SIM: ALL RUNS OK"
+```
+
 ### Regenerating assets
 All art and audio is procedural:
 

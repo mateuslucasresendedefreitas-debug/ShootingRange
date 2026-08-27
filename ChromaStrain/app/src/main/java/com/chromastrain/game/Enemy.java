@@ -79,7 +79,7 @@ public class Enemy {
                 r = 40; speed = 120; hp = 1500 * hpMul * e; contactDmg = 110 * dmgMul; shotDmg = 0;
                 break;
             case VOLATILE:
-                r = 18; speed = 300; hp = 220 * hpMul * e; contactDmg = 150 * dmgMul; shotDmg = 0;
+                r = 18; speed = 300; hp = 220 * hpMul * e; contactDmg = 130 * dmgMul; shotDmg = 0;
                 break;
             case WARDEN:
                 r = 28; speed = 130; hp = 900 * hpMul * e; contactDmg = 70 * dmgMul; shotDmg = 0;
@@ -231,8 +231,8 @@ public class Enemy {
 
         switch (type) {
             case SPITTER: {
-                // keep distance, volley
-                float want = 430;
+                // keep distance, volley; stop kiting when the wave drags on
+                float want = w.waveT > 55f ? 120 : 430;
                 float dir = distP > want + 60 ? 1 : (distP < want - 60 ? -1 : 0);
                 // strafe
                 float strafe = (float) Math.sin(w.time * 0.9f + phaseSeed) * 0.7f;

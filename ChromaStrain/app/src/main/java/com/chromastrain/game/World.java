@@ -47,6 +47,7 @@ public class World {
     public float enemyDmgMul = 1f;
     public boolean altPattern;
     public float waveElapsed;
+    public float waveT;           // time in current wave (anti-stall)
     public float overclockT;      // op6 ramp
     public float surgeT;          // op1 pressure rings
     public float rampCycleT;      // op2 fury/fatigue
@@ -130,6 +131,7 @@ public class World {
             dt *= G.lerp(slowmo, 1f, 0.5f);
         }
 
+        if (state == STATE_WAVE) waveT += wdt;
         updateModifiers(wdt);
         updateStates(dt);
 
@@ -343,6 +345,7 @@ public class World {
         wave = n;
         state = STATE_WAVE;
         waveElapsed = 0;
+        waveT = 0;
         tookDamage = false;
         altPattern = (opId == 3) && (n % 2 == 0); // Flickering Reality
         showBanner("WAVE " + n + " / " + totalWaves, Strain.color(factionOp));
@@ -642,7 +645,7 @@ public class World {
             float roll = G.rnd();
             if (roll < 0.10f) spawnPickup(e.x, e.y, 1, 0);
             else if (roll < 0.32f) spawnPickup(e.x, e.y, 0, G.rndi(4, 11));
-            else if (roll < 0.38f) spawnPickup(e.x, e.y, 2, 0);
+            else if (roll < 0.40f) spawnPickup(e.x, e.y, 2, 0);
         }
     }
 
