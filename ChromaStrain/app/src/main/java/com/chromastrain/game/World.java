@@ -515,7 +515,18 @@ public class World {
             if (e.alive) {
                 if (p.faction == Strain.RED) e.staggerT = Math.max(e.staggerT, 0.5f);
                 if (finisher) e.staggerT = Math.max(e.staggerT, 0.9f);
-                if (crit && p.faction == Strain.GREEN) e.applyBleed(this);
+                if (crit && p.faction == Strain.GREEN) {
+                    e.applyBleed(this);
+                    if (p.setBonus) { // Jadestone Warrior: bleed spreads
+                        for (int k = 0; k < enemies.size(); k++) {
+                            Enemy o = enemies.get(k);
+                            if (o != e && o.alive && o.spawnT <= 0
+                                    && G.dist(e.x, e.y, o.x, o.y) < 150) {
+                                o.applyBleed(this);
+                            }
+                        }
+                    }
+                }
                 if (p.faction == Strain.RED && p.hp / p.maxHp < 0.3f && G.rnd() < 0.35f) {
                     e.applyBurn(this, dmg * 0.2f); // Bloodfire ignite
                 }
@@ -620,6 +631,10 @@ public class World {
     public void onEnemyKilled(Enemy e) {
         kills++;
         player.onKill();
+        // Ashblood Forge: kills on burning enemies vent the skill
+        if (player.setBonus && player.faction == Strain.RED && e.burnT > 0) {
+            player.skillCd = Math.max(0, player.skillCd - 1f);
+        }
         game.sfx.playVar("kill", 0.7f);
         fx.burst(e.x, e.y, e.isBoss() ? 40 : 12, e.isBoss() ? 460 : 260, 0.6f,
                 e.isBoss() ? 11 : 7, e.tint, 2);

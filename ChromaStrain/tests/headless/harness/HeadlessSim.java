@@ -72,6 +72,7 @@ public class HeadlessSim {
         game.sfx.musicOn = false;
         game.save.faction = faction;
         game.save.doses[faction] = 1; // exercise the stabilized-dose path
+        game.save.cleared[faction * 3 + 2] = mode == GOD; // exercise set bonuses
         game.resize(1600, 720);
         World w = new World(game, op);
         Player p = w.player;

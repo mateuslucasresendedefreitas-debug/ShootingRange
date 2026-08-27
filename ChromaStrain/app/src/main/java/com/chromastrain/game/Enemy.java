@@ -122,6 +122,10 @@ public class Enemy {
         float mul = 1f;
         if (hemorrhage) mul *= 1.25f;
         if (crit && critVulnT > 0) mul *= 1.2f;
+        if (w.player.setBonus && w.player.faction == Strain.BLUE) { // Mind's Anchor
+            if (chillStacks > 0) mul *= 1.12f;
+            if (frozenT > 0) mul *= 1.15f;
+        }
         float a = amount * mul;
         if (shieldHp > 0) {
             shieldHp -= a;
@@ -157,7 +161,7 @@ public class Enemy {
     }
 
     public void applyBleed(World w) {
-        bleedT = 5f;
+        bleedT = w.player.setBonus && w.player.faction == Strain.GREEN ? 6.25f : 5f;
         if (bleedStacks < 5) bleedStacks++;
         if (bleedStacks >= 5 && !hemorrhage) {
             hemorrhage = true;
@@ -167,6 +171,7 @@ public class Enemy {
     }
 
     public void applyBurn(World w, float dps) {
+        if (w.player.setBonus && w.player.faction == Strain.RED) dps *= 1.10f;
         burnT = 4f;
         burnDps = Math.max(burnDps, dps);
     }

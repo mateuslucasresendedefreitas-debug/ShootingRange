@@ -105,6 +105,15 @@ public final class Strain {
             "Untouched for 3s: +12% speed and the next hit you take is softened.",
             "Kills grant stacking +3% damage charges (5 max, 6s)."};
 
+    // ------------------------------------------------------------- set bonuses
+    // From the codex weapon sets; forged by clearing the faction's HUNT.
+
+    public static final String[] SET_NAME = {"ASHBLOOD FORGE", "JADESTONE WARRIOR", "MIND'S ANCHOR"};
+    public static final String[] SET_DESC = {
+            "+10% burn damage · kills on burning enemies vent 1s off Seismic Fist",
+            "Bleeds last 25% longer · melee crits spread Bleed to nearby enemies",
+            "+12% damage to Chilled targets · +15% to Frozen targets"};
+
     // ---------------------------------------------------- growth conditions
     // From the codex: a strain blooms when at least two of the three stimulus
     // TYPES are present. [faction][category][items]; category 0 Bio, 1 Energy, 2 Acoustic.

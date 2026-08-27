@@ -121,7 +121,9 @@ Spinal Bloom absorvendo 40%.
 
 - Skills não implementadas viraram lore no codex (Shockspike/Thermal/Mist/Scentbreaker/Focus Shard/Dissonance/Neural Lock citados nas entradas) — slots de expansão natural.
 - Multiplayer/raids em grupo → bosses single-player com as mesmas mecânicas.
-- Sets de equipamento (Ashblood Forge etc.) → candidato a v1.1 (sistema de loot).
+- Sets de equipamento: implementados como **Set Bonuses** (Ashblood Forge / Jadestone
+  Warrior / Mind's Anchor, fiéis aos efeitos do codex), forjados ao limpar o HUNT da
+  facção — o sistema de *loot por peça* completo fica para a v1.1.
 
 ## 8. Roadmap sugerido
 

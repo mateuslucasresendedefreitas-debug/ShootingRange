@@ -420,6 +420,13 @@ public class HubScreen extends Screen {
         float y0 = topH + 10;
         float cardH = (game.h - topH - botH - 40) / 3f;
         G.textB(c, Strain.FACTION[f] + " — " + Strain.CLASS_LINE[f], 24, y0 + 8, 16, Palette.INK_DIM);
+        if (game.save.cleared[f * 3 + Ops.SLOT_HUNT]) {
+            G.textR(c, "SET ACTIVE: " + Strain.SET_NAME[f] + " — " + Strain.SET_DESC[f],
+                    game.w - 24, y0 + 8, 13, Palette.withAlpha(Palette.GOLD, 220));
+        } else if (game.save.tutorialSeen) {
+            G.textR(c, "Clear the HUNT to forge " + Strain.SET_NAME[f],
+                    game.w - 24, y0 + 8, 13, Palette.withAlpha(Palette.INK_DIM, 150));
+        }
         if (!game.save.tutorialSeen) {
             float pulse = (float) Math.sin(t * 5f) * 0.5f + 0.5f;
             G.textB(c, "▲ TAP TO SWITCH STRAIN — EACH ONE PLAYS DIFFERENTLY", 470, y0 + 8, 15,

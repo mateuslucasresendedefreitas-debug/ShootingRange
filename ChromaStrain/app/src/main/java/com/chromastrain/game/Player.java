@@ -57,9 +57,14 @@ public class Player {
     public float hurtFlash;
     public float dashT;
 
+    /** Codex set bonus (Ashblood Forge / Jadestone Warrior / Mind's Anchor),
+     *  forged by clearing this faction's HUNT operation. */
+    public final boolean setBonus;
+
     public Player(World w, int faction, Save save) {
         this.w = w;
         this.faction = faction;
+        setBonus = save.cleared[faction * 3 + Ops.SLOT_HUNT];
         if (faction == Strain.GREEN) baseSpeed = 360;
         maxHp = 1000 * (1f + 0.12f * save.up[0]);
         hp = maxHp;

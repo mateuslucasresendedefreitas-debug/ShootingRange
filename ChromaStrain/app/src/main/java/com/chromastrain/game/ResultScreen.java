@@ -87,6 +87,9 @@ public class ResultScreen extends Screen {
         drawStat(c, cx + 40, py + 96, "RAW NODES", "+" + nodes, Palette.DOSE);
         if (unlockedNext) {
             drawStat(c, cx + 40, py + 146, "UNLOCKED", Ops.NAME[opId + 1], Strain.color(f));
+        } else if (victory && Ops.slot(opId) == Ops.SLOT_HUNT) {
+            drawStat(c, cx + 40, py + 146, "SET FORGED", Strain.SET_NAME[Ops.faction(opId)],
+                    Palette.GOLD);
         } else if (!victory) {
             drawStat(c, cx + 40, py + 146, "TIP", Ops.BOSS_HINT[opId].length() > 34
                     ? Ops.BOSS_HINT[opId].substring(0, 34) + "…" : Ops.BOSS_HINT[opId], Palette.INK_DIM);
